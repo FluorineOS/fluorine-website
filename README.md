@@ -46,23 +46,28 @@ npm run dev
 
 The site runs locally at `http://localhost:3000`.
 
-3. Validate linting and production build:
+3. Validate linting and static HTML production export:
 
 ```sh
 npm run lint
 npm run build
 ```
 
-## Vercel Deployment
+The static HTML bundle outputs directly to `out/`.
 
-This project is configured for zero-config deployment on Vercel:
+## Cloudflare Pages Deployment
 
-1. Import the `FluorineOS/fluorine-website` repository in the Vercel dashboard.
-2. Vercel automatically detects the Next.js framework preset:
-   - Build Command: `npm run build`
-   - Output Directory: `.next`
-   - Install Command: `npm install`
-3. Deploy without requiring custom environment variables.
+This project is configured for static HTML export and zero-configuration deployment on
+Cloudflare Pages:
+
+1. In the Cloudflare dashboard, navigate to Workers & Pages -> Create application -> Pages
+   -> Connect to Git.
+2. Select the `FluorineOS/fluorine-website` repository.
+3. Configure the build settings:
+   - Framework preset: `Next.js (Static HTML Export)`
+   - Build command: `npm run build`
+   - Build output directory: `out`
+4. Deploy the project. No runtime environment variables or server functions are required.
 
 ## License
 
