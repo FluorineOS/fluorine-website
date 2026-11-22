@@ -56,13 +56,18 @@ export function Footer() {
           <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
             Part of the FluorineOS project
           </p>
-          <a
-            href="#top"
-            className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-muted transition-colors hover:text-accent"
-          >
-            <IconArrowUp className="h-3.5 w-3.5" />
-            <span>Back to top</span>
-          </a>
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+            <p className="text-[11px] text-primary/70">
+              Created by Gowtham G.K
+            </p>
+            <a
+              href="#top"
+              className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-muted transition-colors hover:text-accent"
+            >
+              <IconArrowUp className="h-3.5 w-3.5" />
+              <span>Back to top</span>
+            </a>
+          </div>
         </div>
       </div>
     </footer>
