@@ -1,30 +1,30 @@
-import React from "react";
 import { IconLayers, IconCode, IconShield, IconKeyboard } from "./Icons";
+import { Section } from "./Section";
 
 const qualities = [
   {
-    title: "Cohesive Out of the Box",
+    title: "Cohesive out of the box",
     description:
       "Unified Hyprland environment with preconfigured Waybar, Fuzzel, SwayNC, Kitty, and boot splash ready on first boot.",
     icon: IconLayers,
     badge: "Hyprland 0.55+",
   },
   {
-    title: "Plain-Text Customization",
+    title: "Plain-text customization",
     description:
       "Every visual rule, animation curve, and keybinding lives in clean Lua, CSS, and INI files inside ~/.config/.",
     icon: IconCode,
     badge: "Lua & CSS",
   },
   {
-    title: "Debian 13 Foundation",
+    title: "Debian 13 foundation",
     description:
       "Built on Debian Trixie (x86_64) with Hyprland pinned from trixie-backports, PipeWire audio, zstd ZRAM, and an active ufw firewall.",
     icon: IconShield,
     badge: "Debian Trixie",
   },
   {
-    title: "Keyboard-Driven Flow",
+    title: "Keyboard-driven flow",
     description:
       "Fast console login via greetd and tuigreet, predictable tiling layouts, and built-in CLI utilities (flr-shot, flr-keys, flr-doctor).",
     icon: IconKeyboard,
@@ -34,47 +34,39 @@ const qualities = [
 
 export function Qualities() {
   return (
-    <section id="qualities" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-24">
-      <div className="mb-12">
-        <h2 className="text-xs uppercase tracking-wider font-semibold text-[#B4F03A] mb-3">
-          Design & Architecture
-        </h2>
-        <p className="text-2xl sm:text-3xl font-bold tracking-tight text-[#E2E8F0]">
-          Engineered for focus and predictability
-        </p>
-        <p className="mt-3 text-sm text-[#6E7681] max-w-2xl leading-relaxed">
-          FluorineOS avoids complex abstractions. Everything in the user space is
-          inspectable, editable, and backed by Debian package management.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {qualities.map((item, idx) => {
+    <Section
+      id="qualities"
+      eyebrow="Design and architecture"
+      title="Engineered for focus and predictability"
+      description="FluorineOS avoids complex abstractions. Everything in the user space is inspectable, editable, and backed by Debian package management."
+    >
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
+        {qualities.map((item) => {
           const Icon = item.icon;
+
           return (
-            <div
-              key={idx}
-              className="p-6 bg-[#0A0D10] rounded-[6px] border border-[#1C2229] hover:border-[#B4F03A] transition-colors"
-              style={{ borderWidth: "1.5px" }}
+            <article
+              key={item.title}
+              className="group border-[1.5px] border-hairline bg-surface p-5 transition-colors hover:border-accent sm:p-6"
             >
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-9 h-9 rounded-[6px] bg-[#000000] border border-[#1C2229] flex items-center justify-center text-[#B4F03A]" style={{ borderWidth: "1.5px" }}>
-                  <Icon className="w-4 h-4" />
-                </div>
-                <span className="text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-[4px] bg-[#000000] border border-[#1C2229] text-[#6E7681]">
+              <div className="flex items-start justify-between gap-3">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center border-[1.5px] border-hairline bg-canvas text-accent transition-colors group-hover:border-accent">
+                  <Icon className="h-4 w-4" />
+                </span>
+                <span className="border-[1.5px] border-hairline bg-canvas px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
                   {item.badge}
                 </span>
               </div>
-              <h3 className="text-base font-semibold text-[#E2E8F0] mb-2">
+              <h3 className="mt-5 text-[15px] font-semibold text-primary">
                 {item.title}
               </h3>
-              <p className="text-sm text-[#6E7681] leading-relaxed">
+              <p className="mt-2 text-[13px] leading-[1.6] text-primary/80">
                 {item.description}
               </p>
-            </div>
+            </article>
           );
         })}
       </div>
-    </section>
+    </Section>
   );
 }

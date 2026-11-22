@@ -1,7 +1,44 @@
 "use client";
 
-import React, { useState } from "react";
-import { IconCopy, IconCheck, IconCpu, IconTerminal } from "./Icons";
+import { useState } from "react";
+import Link from "next/link";
+import { Section } from "./Section";
+import {
+  IconCheck,
+  IconCopy,
+  IconCpu,
+  IconDownload,
+  IconTerminal,
+} from "./Icons";
+
+type CopyState = "idle" | "copied" | "failed";
+
+async function copyText(text: string): Promise<boolean> {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch {
+    // Fall through to the selection-based fallback below.
+  }
+
+  try {
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.top = "0";
+    area.style.opacity = "0";
+    document.body.appendChild(area);
+    area.select();
+    const succeeded = document.execCommand("copy");
+    document.body.removeChild(area);
+    return succeeded;
+  } catch {
+    return false;
+  }
+}
 
 interface CodeBlockProps {
   label: string;
@@ -9,184 +46,103 @@ interface CodeBlockProps {
 }
 
 function CopyableCodeBlock({ label, command }: CodeBlockProps) {
-  const [copied, setCopied] = useState(false);
+  const [state, setState] = useState<CopyState>("idle");
 
   const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(command);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Fallback
-    }
+    const succeeded = await copyText(command);
+    setState(succeeded ? "copied" : "failed");
+    window.setTimeout(() => setState("idle"), 2400);
   };
 
   return (
-    <div
-      className="bg-[#000000] rounded-[6px] border border-[#1C2229] overflow-hidden"
-      style={{ borderWidth: "1.5px" }}
-    >
-      <div
-        className="flex items-center justify-between px-3.5 py-2 bg-[#0A0D10] border-b border-[#1C2229] text-xs font-mono"
-        style={{ borderBottomWidth: "1.5px" }}
-      >
-        <div className="flex items-center gap-2 text-[#E2E8F0]">
-          <IconTerminal className="w-3.5 h-3.5 text-[#B4F03A]" />
+    <div className="border-[1.5px] border-hairline bg-canvas">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b-[1.5px] border-hairline bg-surface px-3 py-2">
+        <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-primary">
+          <IconTerminal className="h-3.5 w-3.5 text-accent" />
           <span>{label}</span>
         </div>
         <button
+          type="button"
           onClick={handleCopy}
-          className="flex items-center gap-1.5 px-2 py-1 rounded-[4px] border border-[#1C2229] bg-[#000000] text-[#E2E8F0] hover:border-[#B4F03A] hover:text-[#B4F03A] transition-colors text-xs"
-          style={{ borderWidth: "1.5px" }}
+          className={`inline-flex h-7 items-center gap-1.5 border-[1.5px] bg-canvas px-2 font-mono text-[11px] transition-colors ${
+            state === "copied"
+              ? "border-accent text-accent"
+              : state === "failed"
+                ? "border-warning text-warning"
+                : "border-hairline text-primary hover:border-accent hover:text-accent"
+          }`}
         >
-          {copied ? (
-            <>
-              <IconCheck className="w-3.5 h-3.5 text-[#B4F03A]" />
-              <span className="text-[#B4F03A]">Copied</span>
-            </>
+          {state === "copied" ? (
+            <IconCheck className="h-3.5 w-3.5" />
           ) : (
-            <>
-              <IconCopy className="w-3.5 h-3.5" />
-              <span>Copy</span>
-            </>
+            <IconCopy className="h-3.5 w-3.5" />
           )}
+          <span>
+            {state === "copied"
+              ? "Copied"
+              : state === "failed"
+                ? "Select and copy"
+                : "Copy"}
+          </span>
         </button>
+        <span aria-live="polite" className="sr-only">
+          {state === "copied"
+            ? `${label} copied to clipboard`
+            : state === "failed"
+              ? `${label} could not be copied. Select the command and copy it manually.`
+              : ""}
+        </span>
       </div>
-      <div className="p-3.5 overflow-x-auto">
-        <pre className="text-xs font-mono text-[#E2E8F0] leading-relaxed">
-          <code>{command}</code>
-        </pre>
-      </div>
+      <pre className="overflow-x-auto p-3 text-[11px] leading-[1.65] text-primary sm:text-xs">
+        <code>{command}</code>
+      </pre>
     </div>
   );
 }
 
-export function ArchitectureInstall() {
-  return (
-    <section id="architecture" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-24">
-      <div className="mb-12">
-        <h2 className="text-xs uppercase tracking-wider font-semibold text-[#B4F03A] mb-3">
-          Specifications & Deployment
-        </h2>
-        <p className="text-2xl sm:text-3xl font-bold tracking-tight text-[#E2E8F0]">
-          System Architecture & Installation
-        </p>
-        <p className="mt-3 text-sm text-[#6E7681] max-w-2xl leading-relaxed">
-          FluorineOS targets standard x86_64 PC hardware with UEFI firmware. Verified on
-          physical workstations and virtualization hosts.
-        </p>
-      </div>
+const requirements = [
+  { component: "Architecture", value: "x86_64 (amd64)" },
+  { component: "Memory", value: "4 GB minimum, 8 GB or more" },
+  { component: "Storage", value: "20 GB free, 50 GB NVMe / SSD" },
+  { component: "Firmware", value: "UEFI x64" },
+  { component: "Graphics", value: "KMS / DRM; Intel, AMD, or Nouveau" },
+];
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Column: Stack & Hardware Requirements */}
-        <div className="lg:col-span-6 space-y-6">
-          {/* Hardware Requirements */}
-          <div
-            className="p-6 bg-[#0A0D10] rounded-[6px] border border-[#1C2229]"
-            style={{ borderWidth: "1.5px" }}
-          >
-            <div className="flex items-center gap-2 mb-4 text-[#B4F03A]">
-              <IconCpu className="w-4 h-4" />
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-[#E2E8F0]">
-                Hardware Requirements
-              </h3>
-            </div>
+const components = [
+  ["Base distribution", "Debian 13 (trixie)"],
+  ["Wayland compositor", "Hyprland 0.55+ (Lua config)"],
+  ["Display manager", "greetd + tuigreet"],
+  ["Audio server", "PipeWire + WirePlumber"],
+  ["Swap compression", "ZRAM with zstd algorithm"],
+  ["Host firewall", "ufw active by default"],
+];
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs font-mono">
-                <thead>
-                  <tr className="border-b border-[#1C2229] text-[#6E7681]" style={{ borderBottomWidth: "1.5px" }}>
-                    <th className="py-2 pr-4 font-medium">Component</th>
-                    <th className="py-2 pr-4 font-medium">Minimum</th>
-                    <th className="py-2 font-medium">Recommended</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#1C2229] text-[#E2E8F0]">
-                  <tr>
-                    <td className="py-2.5 pr-4 text-[#6E7681]">Architecture</td>
-                    <td className="py-2.5 pr-4">x86_64 (amd64)</td>
-                    <td className="py-2.5">x86_64 (amd64)</td>
-                  </tr>
-                  <tr>
-                    <td className="py-2.5 pr-4 text-[#6E7681]">Memory (RAM)</td>
-                    <td className="py-2.5 pr-4">4 GB</td>
-                    <td className="py-2.5">8 GB or more</td>
-                  </tr>
-                  <tr>
-                    <td className="py-2.5 pr-4 text-[#6E7681]">Storage</td>
-                    <td className="py-2.5 pr-4">20 GB free</td>
-                    <td className="py-2.5">50 GB NVMe / SSD</td>
-                  </tr>
-                  <tr>
-                    <td className="py-2.5 pr-4 text-[#6E7681]">Firmware</td>
-                    <td className="py-2.5 pr-4">UEFI x64</td>
-                    <td className="py-2.5">UEFI x64</td>
-                  </tr>
-                  <tr>
-                    <td className="py-2.5 pr-4 text-[#6E7681]">Graphics</td>
-                    <td className="py-2.5 pr-4">KMS / DRM GPU</td>
-                    <td className="py-2.5">Intel, AMD, or Nouveau</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+const steps: { label: string; title: string; description: string; command: string }[] = [
+  {
+    label: "Step 1",
+    title: "Verify the download",
+    description:
+      "Compare the image against the published checksum before writing it to removable media.",
+    command: "sha256sum -c FluorineOS-0.0.1-amd64.iso.sha256",
+  },
+  {
+    label: "Step 2",
+    title: "Write the image to a USB drive",
+    description:
+      "Replace /dev/sdX with your target device. Everything on that device will be erased.",
+    command:
+      "sudo dd if=FluorineOS-0.0.1-amd64.iso of=/dev/sdX bs=4M status=progress oflag=sync",
+  },
+  {
+    label: "Step 3",
+    title: "Add the APT repository on Debian 13",
+    description:
+      "Optional. Install the desktop stack on an existing trixie system instead of reinstalling.",
+    command: `# Download the archive signing key
+curl -fsSLo /tmp/fluorineos-archive-keyring.gpg https://fluorineos.github.io/apt-repo/fluorineos-archive-keyring.gpg
+sudo install -m 0644 /tmp/fluorineos-archive-keyring.gpg /usr/share/keyrings/fluorineos-archive-keyring.gpg
 
-          {/* Software Stack Specifications */}
-          <div
-            className="p-6 bg-[#0A0D10] rounded-[6px] border border-[#1C2229]"
-            style={{ borderWidth: "1.5px" }}
-          >
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-[#E2E8F0] mb-4">
-              Core System Components
-            </h3>
-            <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono">
-              <div>
-                <dt className="text-[#6E7681]">Base Distribution</dt>
-                <dd className="text-[#E2E8F0] mt-1">Debian 13 (trixie)</dd>
-              </div>
-              <div>
-                <dt className="text-[#6E7681]">Wayland Compositor</dt>
-                <dd className="text-[#E2E8F0] mt-1">Hyprland 0.55+ (Lua config)</dd>
-              </div>
-              <div>
-                <dt className="text-[#6E7681]">Display Manager</dt>
-                <dd className="text-[#E2E8F0] mt-1">greetd + tuigreet</dd>
-              </div>
-              <div>
-                <dt className="text-[#6E7681]">Audio Server</dt>
-                <dd className="text-[#E2E8F0] mt-1">PipeWire + WirePlumber</dd>
-              </div>
-              <div>
-                <dt className="text-[#6E7681]">Swap Compression</dt>
-                <dd className="text-[#E2E8F0] mt-1">ZRAM with zstd algorithm</dd>
-              </div>
-              <div>
-                <dt className="text-[#6E7681]">Host Firewall</dt>
-                <dd className="text-[#E2E8F0] mt-1">ufw active by default</dd>
-              </div>
-            </dl>
-          </div>
-        </div>
-
-        {/* Right Column: Copyable Terminal Blocks */}
-        <div id="install" className="lg:col-span-6 space-y-4 scroll-mt-24">
-          <CopyableCodeBlock
-            label="1. Verify ISO Checksum"
-            command="sha256sum -c FluorineOS-0.0.1-amd64.iso.sha256"
-          />
-
-          <CopyableCodeBlock
-            label="2. Flash to Removable Media (USB)"
-            command="sudo dd if=FluorineOS-0.0.1-amd64.iso of=/dev/sdX bs=4M status=progress oflag=sync"
-          />
-
-          <CopyableCodeBlock
-            label="3. Add APT Repository on Debian 13"
-            command={`# Install archive signing key
-curl -fsSL https://fluorineos.github.io/apt-repo/fluorineos-archive-keyring.gpg | sudo tee /usr/share/keyrings/fluorineos-archive-keyring.gpg > /dev/null
-
-# Configure deb822 source
+# Configure the deb822 source
 sudo tee /etc/apt/sources.list.d/fluorineos.sources << 'EOF'
 Types: deb
 URIs: https://fluorineos.github.io/apt-repo
@@ -196,11 +152,96 @@ Architectures: amd64
 Signed-By: /usr/share/keyrings/fluorineos-archive-keyring.gpg
 EOF
 
-# Refresh package index and install desktop stack
-sudo apt-get update && sudo apt-get install -y fluorine-desktop`}
-          />
+# Refresh the package index and install the desktop stack
+sudo apt-get update && sudo apt-get install -y fluorine-desktop`,
+  },
+];
+
+export function ArchitectureInstall() {
+  return (
+    <Section
+      id="architecture"
+      eyebrow="Specifications and deployment"
+      title="System architecture and installation"
+      description="FluorineOS targets standard x86_64 hardware with UEFI firmware. Verified on physical workstations and virtualization hosts."
+    >
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8">
+        <div className="space-y-6 lg:col-span-5">
+          <div className="border-[1.5px] border-hairline bg-surface p-5 sm:p-6">
+            <h3 className="flex items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
+              <IconCpu className="h-4 w-4 text-accent" />
+              Hardware requirements
+            </h3>
+
+            <dl className="mt-4 border-t-[1.5px] border-hairline">
+              {requirements.map((row) => (
+                <div
+                  key={row.component}
+                  className="grid grid-cols-1 gap-x-4 gap-y-0.5 border-b-[1.5px] border-hairline py-2.5 font-mono text-[11px] last:border-b-0 sm:grid-cols-[8rem_1fr]"
+                >
+                  <dt className="text-muted">{row.component}</dt>
+                  <dd className="text-primary">{row.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+
+          <div className="border-[1.5px] border-hairline bg-surface p-5 sm:p-6">
+            <h3 className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
+              Core system components
+            </h3>
+            <dl className="mt-4 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
+              {components.map(([label, value]) => (
+                <div key={label}>
+                  <dt className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+                    {label}
+                  </dt>
+                  <dd className="mt-1 text-[13px] text-primary">{value}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </div>
+
+        <div id="install" className="scroll-mt-20 lg:col-span-7">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-primary">Installation</h3>
+              <p className="mt-1 text-[13px] leading-[1.6] text-muted">
+                Three steps from the downloaded image to a running workstation.
+              </p>
+            </div>
+            <Link
+              href="https://github.com/FluorineOS/fluorine/releases/latest"
+              className="inline-flex shrink-0 items-center justify-center gap-2 border-[1.5px] border-hairline bg-surface px-3 py-2 text-[12px] font-medium text-primary transition-colors hover:border-accent"
+            >
+              <IconDownload className="h-3.5 w-3.5" />
+              <span>Get the ISO</span>
+            </Link>
+          </div>
+
+          <div className="mt-6 space-y-5">
+            {steps.map((step) => (
+              <article key={step.label}>
+                <h4 className="flex flex-wrap items-baseline gap-2">
+                  <span className="border-[1.5px] border-hairline bg-surface px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-accent">
+                    {step.label}
+                  </span>
+                  <span className="text-[13px] font-semibold text-primary">
+                    {step.title}
+                  </span>
+                </h4>
+                <p className="mt-1.5 text-[13px] leading-[1.6] text-muted">
+                  {step.description}
+                </p>
+                <div className="mt-3">
+                  <CopyableCodeBlock label="Command" command={step.command} />
+                </div>
+              </article>
+            ))}
+          </div>
         </div>
       </div>
-    </section>
+    </Section>
   );
 }

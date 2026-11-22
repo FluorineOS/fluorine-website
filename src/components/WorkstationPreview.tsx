@@ -3,108 +3,126 @@
 import React, { useState } from "react";
 import { IconVolume, IconWifi, IconTerminal, IconCode, IconCheck } from "./Icons";
 
+const tabs = [
+  { id: "fastfetch", label: "fastfetch", icon: IconTerminal },
+  { id: "hyprland", label: "hyprland.lua", icon: IconCode },
+  { id: "doctor", label: "flr-doctor", icon: IconCheck },
+] as const;
+
+type TabId = (typeof tabs)[number]["id"];
+
 export function WorkstationPreview() {
-  const [activeTab, setActiveTab] = useState<"fastfetch" | "hyprland" | "doctor">("fastfetch");
+  const [activeTab, setActiveTab] = useState<TabId>("fastfetch");
+
+  const focusTab = (next: TabId) => {
+    setActiveTab(next);
+    document.getElementById(`tab-${next}`)?.focus();
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    const index = tabs.findIndex((tab) => tab.id === activeTab);
+
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      focusTab(tabs[(index + 1) % tabs.length].id);
+    } else if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      focusTab(tabs[(index - 1 + tabs.length) % tabs.length].id);
+    } else if (event.key === "Home") {
+      event.preventDefault();
+      focusTab(tabs[0].id);
+    } else if (event.key === "End") {
+      event.preventDefault();
+      focusTab(tabs[tabs.length - 1].id);
+    }
+  };
 
   return (
-    <div id="preview" className="w-full max-w-5xl mx-auto mt-12 mb-20 scroll-mt-24">
-      {/* Outer Hyprland Tiling Frame */}
-      <div
-        className="w-full bg-[#000000] rounded-[6px] border border-[#1C2229] overflow-hidden"
-        style={{ borderWidth: "1.5px" }}
-      >
-        {/* Simulated Waybar Top Panel */}
-        <div
-          className="w-full bg-[#0A0D10] border-b border-[#1C2229] px-4 py-1.5 flex items-center justify-between text-xs select-none"
-          style={{ borderBottomWidth: "1.5px" }}
-        >
-          {/* Workspaces */}
+    <div id="preview" className="mx-auto mt-14 max-w-5xl scroll-mt-20 sm:mt-20">
+      <div className="border-[1.5px] border-hairline bg-canvas">
+        <div className="flex items-center justify-between gap-3 border-b-[1.5px] border-hairline bg-surface px-3 py-1.5 text-[11px] select-none sm:px-4">
           <div className="flex items-center gap-1 font-mono">
-            <span className="px-2 py-0.5 text-[#6E7681]">1</span>
-            <span className="px-2 py-0.5 bg-[#B4F03A] text-[#000000] font-semibold rounded-[4px]">
+            <span className="px-1.5 py-0.5 text-muted">1</span>
+            <span className="bg-accent px-1.5 py-0.5 font-semibold text-canvas">
               2
             </span>
-            <span className="px-2 py-0.5 text-[#6E7681]">3</span>
-            <span className="px-2 py-0.5 text-[#6E7681]">4</span>
+            <span className="px-1.5 py-0.5 text-muted">3</span>
+            <span className="px-1.5 py-0.5 text-muted">4</span>
           </div>
 
-          {/* Active Window Title */}
-          <div className="hidden sm:flex items-center gap-2 text-[#E2E8F0] font-mono text-xs">
-            <span className="text-[#6E7681]">$</span>
-            <span>kitty ~ {activeTab === "fastfetch" ? "fastfetch" : activeTab === "hyprland" ? "hyprland.lua" : "flr-doctor"}</span>
+          <div className="hidden items-center gap-2 font-mono text-[11px] text-primary sm:flex">
+            <span className="text-muted">$</span>
+            <span>
+              kitty ~{" "}
+              {activeTab === "fastfetch"
+                ? "fastfetch"
+                : activeTab === "hyprland"
+                  ? "hyprland.lua"
+                  : "flr-doctor"}
+            </span>
           </div>
 
-          {/* System Modules: PipeWire, Network, Clock */}
-          <div className="flex items-center gap-4 text-[#E2E8F0] font-mono text-xs">
+          <div className="flex items-center gap-3 font-mono text-[11px] text-primary sm:gap-4">
             <div className="flex items-center gap-1.5">
-              <IconVolume className="w-3.5 h-3.5 text-[#B4F03A]" />
+              <IconVolume className="h-3.5 w-3.5 text-accent" />
               <span>78%</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <IconWifi className="w-3.5 h-3.5 text-[#B4F03A]" />
+              <IconWifi className="h-3.5 w-3.5 text-accent" />
               <span>100%</span>
             </div>
-            <div className="text-[#E2E8F0] font-semibold">14:45</div>
+            <div className="font-semibold">14:45</div>
           </div>
         </div>
 
-        {/* Tiled Kitty Terminal Frame */}
-        <div className="bg-[#000000] p-4 sm:p-6 font-mono text-xs sm:text-sm">
-          {/* Terminal Tabs Bar */}
+        <div className="p-4 font-mono text-[11px] sm:p-6 sm:text-xs">
           <div
-            className="flex items-center gap-2 border-b border-[#1C2229] pb-3 mb-4"
-            style={{ borderBottomWidth: "1.5px" }}
+            role="tablist"
+            aria-label="Workstation preview panels"
+            onKeyDown={handleKeyDown}
+            className="-mx-1 flex items-center gap-2 overflow-x-auto border-b-[1.5px] border-hairline px-1 pb-3"
           >
-            <button
-              onClick={() => setActiveTab("fastfetch")}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-[4px] border transition-colors ${
-                activeTab === "fastfetch"
-                  ? "bg-[#0A0D10] text-[#B4F03A] border-[#B4F03A]"
-                  : "bg-transparent text-[#6E7681] border-[#1C2229] hover:text-[#E2E8F0] hover:border-[#6E7681]"
-              }`}
-              style={{ borderWidth: "1.5px" }}
-            >
-              <IconTerminal className="w-3.5 h-3.5" />
-              <span>fastfetch</span>
-            </button>
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
 
-            <button
-              onClick={() => setActiveTab("hyprland")}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-[4px] border transition-colors ${
-                activeTab === "hyprland"
-                  ? "bg-[#0A0D10] text-[#B4F03A] border-[#B4F03A]"
-                  : "bg-transparent text-[#6E7681] border-[#1C2229] hover:text-[#E2E8F0] hover:border-[#6E7681]"
-              }`}
-              style={{ borderWidth: "1.5px" }}
-            >
-              <IconCode className="w-3.5 h-3.5" />
-              <span>hyprland.lua</span>
-            </button>
+              return (
+                <button
+                  key={tab.id}
+                  id={`tab-${tab.id}`}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  aria-controls="workstation-panel"
+                  tabIndex={isActive ? 0 : -1}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`inline-flex shrink-0 items-center gap-2 border-[1.5px] px-3 py-1.5 transition-colors ${
+                    isActive
+                      ? "border-accent bg-surface text-accent"
+                      : "border-hairline bg-transparent text-muted hover:text-primary"
+                  }`}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
 
-            <button
-              onClick={() => setActiveTab("doctor")}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-[4px] border transition-colors ${
-                activeTab === "doctor"
-                  ? "bg-[#0A0D10] text-[#B4F03A] border-[#B4F03A]"
-                  : "bg-transparent text-[#6E7681] border-[#1C2229] hover:text-[#E2E8F0] hover:border-[#6E7681]"
-              }`}
-              style={{ borderWidth: "1.5px" }}
-            >
-              <IconCheck className="w-3.5 h-3.5" />
-              <span>flr-doctor</span>
-            </button>
-
-            <div className="ml-auto text-xs text-[#6E7681] hidden md:block">
+            <div className="ml-auto hidden shrink-0 text-[11px] text-muted md:block">
               AMOLED Void Terminal: 80x24
             </div>
           </div>
 
-          {/* Terminal Content Views */}
-          <div className="min-h-[380px] overflow-x-auto leading-relaxed">
-            {activeTab === "fastfetch" && (
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start py-2">
-                {/* ASCII Emblem */}
-                <pre className="lg:col-span-5 text-[#B4F03A] font-mono text-xs sm:text-xs select-none">
+          <div
+            id="workstation-panel"
+            role="tabpanel"
+            aria-labelledby={`tab-${activeTab}`}
+            tabIndex={0}
+            className="min-h-[380px] overflow-x-auto pt-4 leading-[1.65]"
+          >
+            {activeTab === "fastfetch" ? (
+              <div className="grid grid-cols-1 items-start gap-6 py-2 lg:grid-cols-12">
+                <pre className="text-[10px] text-accent select-none sm:text-xs lg:col-span-5">
 {`  _____ _                _
  |  ___| |_   _  ___  _ __(_)_ __
  | |_  | | | | |/ _ \\| '__| | '_ \\
@@ -118,70 +136,39 @@ export function WorkstationPreview() {
       \\___/|____/`}
                 </pre>
 
-                {/* System Specs */}
-                <div className="lg:col-span-7 space-y-1 text-xs sm:text-sm">
-                  <div className="pb-2 border-b border-[#1C2229]" style={{ borderBottomWidth: "1.5px" }}>
-                    <span className="text-[#B4F03A] font-semibold">user@fluorine</span>
-                    <span className="text-[#6E7681]"> ----------------------</span>
+                <dl className="space-y-1 lg:col-span-7">
+                  <div className="border-b-[1.5px] border-hairline pb-2">
+                    <dt className="inline font-semibold text-accent">
+                      user@fluorine
+                    </dt>
+                    <dd className="inline text-muted"> ----------------------</dd>
                   </div>
-                  <div>
-                    <span className="text-[#B4F03A]">OS: </span>
-                    <span className="text-[#E2E8F0]">FluorineOS 0.0.1 x86_64</span>
-                  </div>
-                  <div>
-                    <span className="text-[#B4F03A]">Base: </span>
-                    <span className="text-[#E2E8F0]">Debian GNU/Linux 13 (trixie)</span>
-                  </div>
-                  <div>
-                    <span className="text-[#B4F03A]">Kernel: </span>
-                    <span className="text-[#E2E8F0]">Linux 6.12.9-amd64</span>
-                  </div>
-                  <div>
-                    <span className="text-[#B4F03A]">Uptime: </span>
-                    <span className="text-[#E2E8F0]">2 hours, 14 mins</span>
-                  </div>
-                  <div>
-                    <span className="text-[#B4F03A]">Packages: </span>
-                    <span className="text-[#E2E8F0]">1420 (dpkg)</span>
-                  </div>
-                  <div>
-                    <span className="text-[#B4F03A]">Shell: </span>
-                    <span className="text-[#E2E8F0]">bash 5.2.37</span>
-                  </div>
-                  <div>
-                    <span className="text-[#B4F03A]">Display: </span>
-                    <span className="text-[#E2E8F0]">3840x2160 @ 144Hz</span>
-                  </div>
-                  <div>
-                    <span className="text-[#B4F03A]">WM: </span>
-                    <span className="text-[#E2E8F0]">Hyprland 0.55.0 (Wayland)</span>
-                  </div>
-                  <div>
-                    <span className="text-[#B4F03A]">Theme: </span>
-                    <span className="text-[#E2E8F0]">AMOLED Void (#000000 / #B4F03A)</span>
-                  </div>
-                  <div>
-                    <span className="text-[#B4F03A]">Terminal: </span>
-                    <span className="text-[#E2E8F0]">kitty 0.38.0</span>
-                  </div>
-                  <div>
-                    <span className="text-[#B4F03A]">Login: </span>
-                    <span className="text-[#E2E8F0]">greetd + tuigreet</span>
-                  </div>
-                  <div>
-                    <span className="text-[#B4F03A]">Audio: </span>
-                    <span className="text-[#E2E8F0]">PipeWire 1.2.7 (WirePlumber)</span>
-                  </div>
-                  <div>
-                    <span className="text-[#B4F03A]">Memory: </span>
-                    <span className="text-[#E2E8F0]">1.84 GiB / 31.25 GiB (ZRAM zstd active)</span>
-                  </div>
-                </div>
+                  {[
+                    ["OS", "FluorineOS 0.0.1 x86_64"],
+                    ["Base", "Debian GNU/Linux 13 (trixie)"],
+                    ["Kernel", "Linux 6.12.9-amd64"],
+                    ["Uptime", "2 hours, 14 mins"],
+                    ["Packages", "1420 (dpkg)"],
+                    ["Shell", "bash 5.2.37"],
+                    ["Display", "3840x2160 @ 144Hz"],
+                    ["WM", "Hyprland 0.55.0 (Wayland)"],
+                    ["Theme", "AMOLED Void (#000000 / #B4F03A)"],
+                    ["Terminal", "kitty 0.38.0"],
+                    ["Login", "greetd + tuigreet"],
+                    ["Audio", "PipeWire 1.2.7 (WirePlumber)"],
+                    ["Memory", "1.84 GiB / 31.25 GiB (ZRAM zstd active)"],
+                  ].map(([label, value]) => (
+                    <div key={label} className="flex gap-1">
+                      <dt className="shrink-0 text-accent">{label}: </dt>
+                      <dd className="text-primary">{value}</dd>
+                    </div>
+                  ))}
+                </dl>
               </div>
-            )}
+            ) : null}
 
-            {activeTab === "hyprland" && (
-              <pre className="text-xs sm:text-sm text-[#E2E8F0] font-mono leading-relaxed py-2">
+            {activeTab === "hyprland" ? (
+              <pre className="py-2 text-[11px] text-primary sm:text-xs">
                 <code>
 {`-- ~/.config/hypr/hyprland.lua
 -- FluorineOS native Lua compositor configuration
@@ -221,10 +208,10 @@ hl.bind("SUPER + V",      hl.dsp.window.float({ action = "toggle" }))
 hl.bind("SUPER + F",      hl.dsp.window.fullscreen({ action = "toggle" }))`}
                 </code>
               </pre>
-            )}
+            ) : null}
 
-            {activeTab === "doctor" && (
-              <pre className="text-xs sm:text-sm text-[#E2E8F0] font-mono leading-relaxed py-2">
+            {activeTab === "doctor" ? (
+              <pre className="py-2 text-[11px] text-primary sm:text-xs">
                 <code>
 {`$ flr-doctor
 
@@ -257,10 +244,14 @@ Renderer
 All diagnostic health checks passed.`}
                 </code>
               </pre>
-            )}
+            ) : null}
           </div>
         </div>
       </div>
+
+      <p className="mt-3 text-center font-mono text-[11px] text-muted">
+        Simulated preview of the default Hyprland session.
+      </p>
     </div>
   );
 }

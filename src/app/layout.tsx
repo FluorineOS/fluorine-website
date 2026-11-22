@@ -1,46 +1,68 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
-  variable: "--font-sans",
+  variable: "--font-inter",
   subsets: ["latin"],
   display: "swap",
 });
 
 const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-mono",
+  variable: "--font-jetbrains",
   subsets: ["latin"],
   display: "swap",
 });
 
+const title = "FluorineOS - Debian 13 and Hyprland Wayland Workstation";
+const description =
+  "Official website and documentation portal for FluorineOS. A clean, customizable Wayland workstation built on Debian 13 (Trixie) and Hyprland 0.55+.";
+
 export const metadata: Metadata = {
-  title: "FluorineOS - Debian 13 and Hyprland Wayland Workstation",
-  description:
-    "Official website and documentation portal for FluorineOS. A clean, customizable Wayland workstation built on Debian 13 (Trixie) and Hyprland 0.55+.",
+  title,
+  description,
+  applicationName: "FluorineOS",
   metadataBase: new URL("https://fluorineos.org"),
   alternates: {
     canonical: "/",
   },
+  icons: {
+    icon: [{ url: "/fluorine-logo.png", type: "image/png" }],
+    apple: [{ url: "/fluorine-logo.png", type: "image/png" }],
+  },
   openGraph: {
-    title: "FluorineOS - Debian 13 and Hyprland Wayland Workstation",
+    title,
     description:
       "A clean, customizable Wayland workstation built on Debian 13 (Trixie) and Hyprland 0.55+. Cohesive out of the box, configured in readable plain text.",
     url: "https://fluorineos.org",
     siteName: "FluorineOS",
     locale: "en_US",
     type: "website",
+    images: [
+      {
+        url: "/fluorine-logo.png",
+        width: 1254,
+        height: 1254,
+        alt: "FluorineOS",
+      },
+    ],
   },
   twitter: {
-    card: "summary_large_image",
-    title: "FluorineOS - Debian 13 and Hyprland Wayland Workstation",
+    card: "summary",
+    title,
     description:
       "A clean, customizable Wayland workstation built on Debian 13 (Trixie) and Hyprland 0.55+.",
+    images: ["/fluorine-logo.png"],
   },
   robots: {
     index: true,
     follow: true,
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#000000",
+  colorScheme: "dark",
 };
 
 export default function RootLayout({
@@ -51,9 +73,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased dark`}
+      className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[#000000] text-[#E2E8F0] font-sans">
+      <body className="flex min-h-full flex-col bg-canvas font-sans text-primary">
         {children}
       </body>
     </html>

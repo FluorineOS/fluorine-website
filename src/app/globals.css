@@ -9,6 +9,7 @@
   --accent-selection: #2A3812;
   --text-primary: #E2E8F0;
   --text-muted: #6E7681;
+  --status-warning: #D29922;
 }
 
 @theme {
@@ -20,53 +21,72 @@
   --color-selection: var(--accent-selection);
   --color-primary: var(--text-primary);
   --color-muted: var(--text-muted);
+  --color-warning: var(--status-warning);
 
-  --font-sans: var(--font-sans), system-ui, sans-serif;
-  --font-mono: var(--font-mono), monospace;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), "JetBrains Mono", monospace;
 }
 
-* {
-  box-shadow: none !important;
-}
+@layer base {
+  html {
+    background-color: var(--bg-canvas);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
 
-::selection {
-  background-color: var(--accent-selection);
-  color: var(--accent-primary);
-}
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-canvas);
+    color: var(--text-primary);
+  }
 
-html {
-  background-color: var(--bg-canvas);
-  color: var(--text-primary);
-  font-family: var(--font-sans);
-  scroll-behavior: smooth;
-}
+  ::selection {
+    background-color: var(--accent-selection);
+    color: var(--text-primary);
+  }
 
-body {
-  background-color: var(--bg-canvas);
-  color: var(--text-primary);
-  font-family: var(--font-sans);
-  min-height: 100vh;
-  margin: 0;
-  padding: 0;
-  -webkit-font-smoothing: antialiased;
-}
+  :focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+  }
 
-.hairline-border {
-  border: 1.5px solid var(--border-hairline);
-}
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--text-muted) var(--border-hairline);
+  }
 
-.hairline-t {
-  border-top: 1.5px solid var(--border-hairline);
-}
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
 
-.hairline-b {
-  border-bottom: 1.5px solid var(--border-hairline);
-}
+  ::-webkit-scrollbar-track {
+    background-color: var(--border-hairline);
+  }
 
-.hairline-l {
-  border-left: 1.5px solid var(--border-hairline);
-}
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--text-muted);
+  }
 
-.hairline-r {
-  border-right: 1.5px solid var(--border-hairline);
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--accent-primary);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }

@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
-import { IconSearch } from "./Icons";
+import { useMemo, useState } from "react";
+import { IconSearch, IconX } from "./Icons";
+import { Section } from "./Section";
 
 interface KeybindingItem {
   keys: string[];
@@ -67,107 +68,168 @@ const keybindings: KeybindingItem[] = [
   },
 ];
 
+function KeyCaps({ keys }: { keys: string[] }) {
+  return (
+    <div className="flex flex-wrap items-center gap-1.5">
+      {keys.map((key, index) => (
+        <span key={`${key}-${index}`} className="flex items-center gap-1.5">
+          <kbd className="inline-flex h-6 items-center whitespace-nowrap border-[1.5px] border-hairline bg-surface px-1.5 font-mono text-[11px] font-semibold text-primary">
+            {key}
+          </kbd>
+          {index < keys.length - 1 ? (
+            <span aria-hidden="true" className="font-mono text-[11px] text-muted">
+              +
+            </span>
+          ) : null}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 export function Keybindings() {
   const [query, setQuery] = useState("");
 
-  const filtered = keybindings.filter((item) => {
-    const q = query.toLowerCase().trim();
-    if (!q) return true;
-    const matchAction = item.action.toLowerCase().includes(q);
-    const matchCategory = item.category.toLowerCase().includes(q);
-    const matchKeys = item.keys.some((k) => k.toLowerCase().includes(q));
-    return matchAction || matchCategory || matchKeys;
-  });
+  const filtered = useMemo(() => {
+    const needle = query.toLowerCase().trim();
+
+    if (!needle) {
+      return keybindings;
+    }
+
+    return keybindings.filter((item) => {
+      return (
+        item.action.toLowerCase().includes(needle) ||
+        item.category.toLowerCase().includes(needle) ||
+        item.keys.some((key) => key.toLowerCase().includes(needle))
+      );
+    });
+  }, [query]);
+
+  const filter = (
+    <div className="relative w-full md:w-80">
+      <label htmlFor="keybinding-filter" className="sr-only">
+        Filter shortcuts
+      </label>
+      <IconSearch className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
+      <input
+        id="keybinding-filter"
+        type="search"
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+        placeholder="Filter shortcuts..."
+        autoComplete="off"
+        className="w-full appearance-none border-[1.5px] border-hairline bg-canvas py-2.5 pl-9 pr-9 font-mono text-xs text-primary transition-colors placeholder:text-muted focus:border-accent focus:outline-none"
+      />
+      {query ? (
+        <button
+          type="button"
+          onClick={() => setQuery("")}
+          aria-label="Clear filter"
+          className="absolute right-2 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center text-muted transition-colors hover:text-accent"
+        >
+          <IconX className="h-3.5 w-3.5" />
+        </button>
+      ) : null}
+    </div>
+  );
 
   return (
-    <section id="keybindings" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-24">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
-        <div>
-          <h2 className="text-xs uppercase tracking-wider font-semibold text-[#B4F03A] mb-3">
-            Workflow Reference
-          </h2>
-          <p className="text-2xl sm:text-3xl font-bold tracking-tight text-[#E2E8F0]">
-            Default Keybindings
-          </p>
-          <p className="mt-2 text-sm text-[#6E7681]">
-            Configured in <code className="text-[#E2E8F0] font-mono">~/.config/hypr/hyprland.lua</code> via native Lua binds.
-          </p>
-        </div>
-
-        {/* Client-side Search Input */}
-        <div className="relative w-full md:w-80">
-          <IconSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6E7681]" />
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search shortcuts or actions..."
-            className="w-full bg-[#0A0D10] text-[#E2E8F0] placeholder-[#6E7681] text-xs font-mono pl-10 pr-4 py-2.5 rounded-[6px] border border-[#1C2229] focus:outline-none focus:border-[#B4F03A] transition-colors"
-            style={{ borderWidth: "1.5px" }}
-          />
-        </div>
-      </div>
-
-      {/* Table Container */}
-      <div
-        className="w-full bg-[#0A0D10] rounded-[6px] border border-[#1C2229] overflow-hidden"
-        style={{ borderWidth: "1.5px" }}
+    <Section
+      id="keybindings"
+      eyebrow="Workflow reference"
+      title="Default keybindings"
+      description="Native Lua binds from ~/.config/hypr/hyprland.lua. Filter by action, category, or chord."
+      action={filter}
+    >
+      <p
+        aria-live="polite"
+        className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted"
       >
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs sm:text-sm">
-            <thead>
-              <tr
-                className="border-b border-[#1C2229] bg-[#000000] text-[#6E7681] font-mono text-xs uppercase"
-                style={{ borderBottomWidth: "1.5px" }}
-              >
-                <th className="py-3 px-4 sm:px-6 font-medium">Shortcut Chord</th>
-                <th className="py-3 px-4 sm:px-6 font-medium">Action Description</th>
-                <th className="py-3 px-4 sm:px-6 font-medium hidden sm:table-cell">Category</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#1C2229]">
-              {filtered.length > 0 ? (
-                filtered.map((item, idx) => (
-                  <tr
-                    key={idx}
-                    className="hover:bg-[#12171F] transition-colors"
+        {filtered.length} of {keybindings.length} shortcuts
+      </p>
+
+      {filtered.length === 0 ? (
+        <div className="mt-4 border-[1.5px] border-hairline bg-canvas p-8 text-center">
+          <p className="font-mono text-xs text-primary">
+            No shortcuts match &quot;{query}&quot;.
+          </p>
+          <button
+            type="button"
+            onClick={() => setQuery("")}
+            className="mt-4 border-[1.5px] border-hairline bg-surface px-3 py-2 font-mono text-[11px] uppercase tracking-[0.14em] text-primary transition-colors hover:border-accent hover:text-accent"
+          >
+            Clear filter
+          </button>
+        </div>
+      ) : (
+        <>
+          <div className="mt-4 hidden border-[1.5px] border-hairline bg-canvas lg:block">
+            <table className="w-full border-collapse text-left">
+              <caption className="sr-only">
+                Default FluorineOS keybindings
+              </caption>
+              <thead>
+                <tr className="border-b-[1.5px] border-hairline bg-surface">
+                  <th
+                    scope="col"
+                    className="px-5 py-3 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted"
                   >
-                    <td className="py-3 px-4 sm:px-6 whitespace-nowrap">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        {item.keys.map((k, kIdx) => (
-                          <React.Fragment key={kIdx}>
-                            <kbd
-                              className="px-2 py-1 bg-[#000000] text-[#E2E8F0] border border-[#1C2229] rounded-[4px] font-mono text-xs font-semibold"
-                              style={{ borderWidth: "1.5px" }}
-                            >
-                              {k}
-                            </kbd>
-                            {kIdx < item.keys.length - 1 && (
-                              <span className="text-[#6E7681] font-mono text-xs">+</span>
-                            )}
-                          </React.Fragment>
-                        ))}
-                      </div>
+                    Shortcut
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-5 py-3 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted"
+                  >
+                    Action
+                  </th>
+                  <th
+                    scope="col"
+                    className="w-52 whitespace-nowrap px-5 py-3 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted"
+                  >
+                    Category
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((item) => (
+                  <tr
+                    key={item.action}
+                    className="border-t-[1.5px] border-hairline transition-colors first:border-t-0 hover:bg-surface"
+                  >
+                    <td className="px-5 py-3">
+                      <KeyCaps keys={item.keys} />
                     </td>
-                    <td className="py-3 px-4 sm:px-6 text-[#E2E8F0]">
+                    <td className="px-5 py-3 text-[13px] text-primary">
                       {item.action}
                     </td>
-                    <td className="py-3 px-4 sm:px-6 text-[#6E7681] font-mono text-xs hidden sm:table-cell">
+                    <td className="whitespace-nowrap px-5 py-3 font-mono text-[11px] text-muted">
                       {item.category}
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={3} className="py-8 text-center text-[#6E7681] font-mono text-xs">
-                    No matching keybindings found for &quot;{query}&quot;
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <ul className="mt-4 space-y-3 lg:hidden">
+            {filtered.map((item) => (
+              <li
+                key={item.action}
+                className="border-[1.5px] border-hairline bg-canvas p-4"
+              >
+                <KeyCaps keys={item.keys} />
+                <p className="mt-3 text-[13px] leading-[1.6] text-primary">
+                  {item.action}
+                </p>
+                <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+                  {item.category}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </Section>
   );
 }

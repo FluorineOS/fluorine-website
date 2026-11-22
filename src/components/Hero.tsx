@@ -1,55 +1,67 @@
-import React from "react";
 import Link from "next/link";
 import { IconDownload, IconExternal } from "./Icons";
 import { WorkstationPreview } from "./WorkstationPreview";
 
+const platformMeta = ["Debian 13 (trixie)", "Hyprland 0.55+", "amd64 (x86_64)"];
+
 export function Hero() {
   return (
-    <section className="pt-16 pb-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col items-center text-center">
-      {/* Version Pill */}
-      <div
-        className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-[6px] bg-[#0A0D10] border border-[#1C2229] mb-8 text-xs font-mono text-[#E2E8F0]"
-        style={{ borderWidth: "1.5px" }}
-      >
-        <span className="w-2 h-2 rounded-full bg-[#B4F03A]" />
-        <span>Release 0.0.1 - Debian 13 (Trixie) + Hyprland 0.55+</span>
+    <section aria-labelledby="hero-title" className="bg-canvas">
+      <div className="mx-auto max-w-7xl px-5 pt-12 pb-8 sm:px-6 sm:pt-20 lg:px-8">
+        <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
+          <p className="inline-flex items-center gap-2 border-[1.5px] border-hairline bg-surface px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-primary">
+            <span aria-hidden="true" className="h-1.5 w-1.5 bg-accent" />
+            Release 0.0.1
+          </p>
+
+          <h1
+            id="hero-title"
+            className="mt-7 text-balance text-[2.25rem] font-bold leading-[1.08] tracking-tight text-primary sm:text-5xl sm:leading-[1.05] lg:text-6xl"
+          >
+            A clean, customizable Wayland workstation.
+          </h1>
+
+          <p className="mt-6 max-w-2xl text-pretty text-[15px] leading-[1.6] text-muted sm:text-base">
+            Built on Debian 13 and Hyprland. Cohesive out of the box, configured
+            in readable plain text, and engineered for focused daily development.
+          </p>
+
+          <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
+            {platformMeta.map((item, index) => (
+              <li key={item} className="flex items-center gap-2">
+                <span>{item}</span>
+                {index < platformMeta.length - 1 ? (
+                  <span aria-hidden="true" className="text-hairline">
+                    /
+                  </span>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-9 flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center">
+            <Link
+              href="https://github.com/FluorineOS/fluorine/releases/latest"
+              className="inline-flex items-center justify-center gap-2 bg-accent px-5 py-3 text-sm font-semibold text-canvas transition-colors hover:bg-accent-hover"
+            >
+              <IconDownload className="h-4 w-4" />
+              <span>Download ISO 0.0.1</span>
+            </Link>
+
+            <Link
+              href="https://github.com/FluorineOS/fluorine"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center justify-center gap-2 border-[1.5px] border-hairline bg-surface px-5 py-3 text-sm font-medium text-primary transition-colors hover:border-accent"
+            >
+              <span>Explore source</span>
+              <IconExternal className="h-4 w-4 text-muted transition-colors group-hover:text-accent" />
+            </Link>
+          </div>
+        </div>
+
+        <WorkstationPreview />
       </div>
-
-      {/* Main Headline */}
-      <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#E2E8F0] max-w-4xl">
-        A clean, customizable Wayland workstation.
-      </h1>
-
-      {/* Subheadline */}
-      <p className="mt-6 text-base sm:text-lg text-[#6E7681] max-w-2xl leading-relaxed">
-        Built on Debian 13 and Hyprland. Cohesive out of the box, configured in
-        readable plain text, and engineered for focused daily development.
-      </p>
-
-      {/* Call to Actions */}
-      <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-        <Link
-          href="https://github.com/FluorineOS/fluorine/releases/latest"
-          className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-[#000000] bg-[#B4F03A] hover:bg-[#C6F75E] rounded-[6px] transition-colors"
-        >
-          <IconDownload className="w-4 h-4 stroke-[2]" />
-          <span>Download ISO (0.0.1)</span>
-        </Link>
-
-        <Link
-          href="https://github.com/FluorineOS/fluorine"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-[#E2E8F0] bg-[#0A0D10] border border-[#1C2229] rounded-[6px] hover:border-[#B4F03A] transition-colors"
-          style={{ borderWidth: "1.5px" }}
-        >
-          <span>Explore Source</span>
-          <IconExternal className="w-4 h-4 text-[#6E7681]" />
-        </Link>
-      </div>
-
-      {/* Interactive Workstation Preview */}
-      <WorkstationPreview />
     </section>
   );
 }
