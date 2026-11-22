@@ -1,13 +1,41 @@
 import Link from "next/link";
 import { IconDownload, IconExternal } from "./Icons";
+import LightRays from "./LightRays";
 import { WorkstationPreview } from "./WorkstationPreview";
 
 const platformMeta = ["Debian 13 (trixie)", "Hyprland 0.55+", "amd64 (x86_64)"];
 
 export function Hero() {
   return (
-    <section aria-labelledby="hero-title" className="bg-canvas">
-      <div className="mx-auto max-w-7xl px-5 pt-12 pb-8 sm:px-6 sm:pt-20 lg:px-8">
+    <section
+      aria-labelledby="hero-title"
+      className="relative isolate overflow-hidden bg-canvas"
+    >
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[600px]"
+        style={{
+          maskImage:
+            "linear-gradient(to bottom, #000000 0%, #000000 55%, transparent 100%)",
+          WebkitMaskImage:
+            "linear-gradient(to bottom, #000000 0%, #000000 55%, transparent 100%)",
+        }}
+      >
+        <LightRays
+          raysOrigin="top-center"
+          raysColor="#b4f03a"
+          raysSpeed={1}
+          lightSpread={0.5}
+          rayLength={3}
+          glow={0.6}
+          haze={0.25}
+          followMouse
+          mouseInfluence={0.1}
+          opacity={0.5}
+        />
+      </div>
+
+      <div className="relative mx-auto max-w-7xl px-5 pt-12 pb-8 sm:px-6 sm:pt-20 lg:px-8">
         <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
           <p className="inline-flex items-center gap-2 border-[1.5px] border-hairline bg-surface px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-primary">
             <span aria-hidden="true" className="h-1.5 w-1.5 bg-accent" />
