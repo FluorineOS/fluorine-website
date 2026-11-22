@@ -13,34 +13,50 @@ const navLinks = [
   { id: "install", label: "Install" },
 ];
 
+// The install anchor lives inside the architecture section, so it is not a
+// scroll target of its own. Observing it made the section highlight flip to
+// "Install" as soon as the architecture section reached the viewport.
+const scrollTargets = ["preview", "qualities", "keybindings", "architecture"];
+
+// Offset of the sticky header plus a small breathing room.
+const ACTIVE_LINE = 96;
+
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("");
 
   useEffect(() => {
-    const sections = navLinks
-      .map((link) => document.getElementById(link.id))
+    const targets = scrollTargets
+      .map((id) => document.getElementById(id))
       .filter((element): element is HTMLElement => element !== null);
 
-    if (sections.length === 0) {
+    if (targets.length === 0) {
       return;
     }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+    const update = () => {
+      const line = window.scrollY + ACTIVE_LINE;
+      let current = "";
 
-        if (visible) {
-          setActive(visible.target.id);
+      for (const target of targets) {
+        const top = target.getBoundingClientRect().top + window.scrollY;
+
+        if (top <= line) {
+          current = target.id;
         }
-      },
-      { rootMargin: "-88px 0px -45% 0px", threshold: [0, 0.25, 0.5, 0.75] },
-    );
+      }
 
-    sections.forEach((section) => observer.observe(section));
-    return () => observer.disconnect();
+      setActive(current);
+    };
+
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
   }, []);
 
   useEffect(() => {
