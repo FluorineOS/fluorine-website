@@ -157,6 +157,13 @@ sudo apt-get update && sudo apt-get install -y fluorine-desktop`,
   },
 ];
 
+const releaseImage = {
+  version: "0.0.1",
+  name: "FluorineOS-0.0.1-amd64.iso",
+  size: "1.28 GiB (1375442944 bytes)",
+  digest: "17716220f311141ad5ad05eb50bfcb54806f05d81bcccb26ba3a02d9f1234e0a",
+};
+
 export function ArchitectureInstall() {
   return (
     <Section
@@ -218,6 +225,26 @@ export function ArchitectureInstall() {
               <IconDownload className="h-3.5 w-3.5" />
               <span>Get the ISO</span>
             </Link>
+          </div>
+
+          <div className="mt-6 border-[1.5px] border-hairline bg-surface p-4 sm:p-5">
+            <h4 className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+              Release image {releaseImage.version}
+            </h4>
+            <dl className="mt-3 space-y-2 font-mono text-[11px] leading-[1.6]">
+              <div className="flex flex-col gap-0.5 sm:flex-row sm:gap-3">
+                <dt className="shrink-0 text-muted sm:w-20">File</dt>
+                <dd className="break-all text-primary">{releaseImage.name}</dd>
+              </div>
+              <div className="flex flex-col gap-0.5 sm:flex-row sm:gap-3">
+                <dt className="shrink-0 text-muted sm:w-20">Size</dt>
+                <dd className="break-all text-primary">{releaseImage.size}</dd>
+              </div>
+              <div className="flex flex-col gap-0.5 sm:flex-row sm:gap-3">
+                <dt className="shrink-0 text-muted sm:w-20">SHA-256</dt>
+                <dd className="break-all text-primary">{releaseImage.digest}</dd>
+              </div>
+            </dl>
           </div>
 
           <div className="mt-6 space-y-5">
