@@ -71,7 +71,8 @@ Cloudflare Pages:
 
 ## License
 
-This repository is part of the FluorineOS project.
+This repository is part of the FluorineOS project and is released under the MIT
+License. See [LICENSE](LICENSE) for the full text.
 
 [main]: https://github.com/FluorineOS/fluorine
 [releases]: https://github.com/FluorineOS/fluorine/releases/tag/v0.0.1
