@@ -219,7 +219,7 @@ export function ArchitectureInstall() {
               </p>
             </div>
             <Link
-              href="https://github.com/FluorineOS/fluorine/releases/latest"
+              href="https://github.com/FluorineOS/fluorine/releases/tag/v0.0.1"
               className="inline-flex shrink-0 items-center justify-center gap-2 border-[1.5px] border-hairline bg-surface px-3 py-2 text-[12px] font-medium text-primary transition-colors hover:border-accent"
             >
               <IconDownload className="h-3.5 w-3.5" />

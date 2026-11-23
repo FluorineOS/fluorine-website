@@ -74,6 +74,6 @@ Cloudflare Pages:
 This repository is part of the FluorineOS project.
 
 [main]: https://github.com/FluorineOS/fluorine
-[releases]: https://github.com/FluorineOS/fluorine/releases/latest
+[releases]: https://github.com/FluorineOS/fluorine/releases/tag/v0.0.1
 [apt]: https://fluorineos.github.io/apt-repo
 [issues]: https://github.com/FluorineOS/fluorine/issues

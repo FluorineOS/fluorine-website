@@ -69,7 +69,7 @@ export function Hero() {
 
           <div className="mt-9 flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center">
             <Link
-              href="https://github.com/FluorineOS/fluorine/releases/latest"
+              href="https://github.com/FluorineOS/fluorine/releases/tag/v0.0.1"
               className="inline-flex items-center justify-center gap-2 bg-accent px-5 py-3 text-sm font-semibold text-canvas transition-colors hover:bg-accent-hover"
             >
               <IconDownload className="h-4 w-4" />
