@@ -89,7 +89,7 @@ export function Navbar() {
             height={36}
             className="h-9 w-9"
           />
-          <span className="text-[15px] font-semibold tracking-tight">
+          <span className="font-display text-[15px]">
             <span className="text-primary">Fluorine</span>
             <span className="text-accent">OS</span>
           </span>

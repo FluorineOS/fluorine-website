@@ -44,7 +44,7 @@ export function Hero() {
 
           <h1
             id="hero-title"
-            className="mt-7 text-balance text-[2.25rem] font-bold leading-[1.08] tracking-tight text-primary sm:text-5xl sm:leading-[1.05] lg:text-6xl"
+            className="mt-7 text-balance text-[2.25rem] leading-[1.08] text-primary sm:text-5xl sm:leading-[1.05] lg:text-6xl"
           >
             A clean, customizable Wayland workstation.
           </h1>

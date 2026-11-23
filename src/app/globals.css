@@ -23,15 +23,17 @@
   --color-muted: var(--text-muted);
   --color-warning: var(--status-warning);
 
-  --font-sans: var(--font-inter), system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains), "JetBrains Mono", monospace;
+  /* --font-sans and --font-mono are supplied by next/font on the <html>
+     element. The display tier is a pixel face, so it keeps a composite token
+     that also backs the `font-display` utility. */
+  --font-display: var(--font-pixel), var(--font-sans), sans-serif;
 }
 
 @layer base {
   html {
     background-color: var(--bg-canvas);
     color: var(--text-primary);
-    font-family: var(--font-sans);
+    font-family: var(--font-sans), system-ui, sans-serif;
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
     text-rendering: optimizeLegibility;
@@ -42,7 +44,39 @@
     padding: 0;
     background-color: var(--bg-canvas);
     color: var(--text-primary);
+    font-family: var(--font-sans), sans-serif;
+    line-height: 1.65;
   }
+
+  /* Display tier: Jersey 15, reserved for h1, h2, and the wordmark. It ships a
+     single 400 cut on a literal pixel grid, so bolding or synthetically
+     emphasising it would smear the blocks. */
+  h1,
+  h2,
+  .font-display {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-synthesis: none;
+    letter-spacing: 0.02em;
+  }
+
+  /* UI tier: h3 card titles, buttons, and body copy stay on Space Grotesk. */
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-sans), sans-serif;
+  }
+
+  /* Monospace tier: code, terminal panes, and keycaps. */
+  code,
+  pre,
+  kbd,
+  samp,
+  .font-mono {
+    font-family: var(--font-mono), monospace;
+  }
+
 
   ::selection {
     background-color: var(--accent-selection);

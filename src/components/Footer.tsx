@@ -23,7 +23,7 @@ export function Footer() {
                 height={28}
                 className="h-7 w-7"
               />
-              <span className="text-sm font-semibold tracking-tight">
+              <span className="font-display text-sm">
                 <span className="text-primary">Fluorine</span>
                 <span className="text-accent">OS</span>
               </span>
