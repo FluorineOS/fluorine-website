@@ -160,8 +160,8 @@ sudo apt-get update && sudo apt-get install -y fluorine-desktop`,
 const releaseImage = {
   version: "0.0.1",
   name: "FluorineOS-0.0.1-amd64.iso",
-  size: "1.28 GiB (1375442944 bytes)",
-  digest: "17716220f311141ad5ad05eb50bfcb54806f05d81bcccb26ba3a02d9f1234e0a",
+  size: "1.29 GiB (1388937216 bytes)",
+  digest: "352724cf630ce6ea900256131cf45dfdbebcb888cf96ab313ec9ec1d7d0fc8c0",
 };
 
 export function ArchitectureInstall() {
