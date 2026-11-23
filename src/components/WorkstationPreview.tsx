@@ -144,7 +144,7 @@ export function WorkstationPreview() {
                     <dd className="inline text-muted"> ----------------------</dd>
                   </div>
                   {[
-                    ["OS", "FluorineOS 0.0.1 x86_64"],
+                    ["OS", "FluorineOS 0.1.0 x86_64"],
                     ["Base", "Debian GNU/Linux 13 (trixie)"],
                     ["Kernel", "Linux 6.12.9-amd64"],
                     ["Uptime", "2 hours, 14 mins"],
@@ -217,8 +217,8 @@ hl.bind("SUPER + F",      hl.dsp.window.fullscreen({ action = "toggle" }))`}
 
 FluorineOS
 ------------------------------------------------------------
-  Version                        0.0.1
-  Distribution                   FluorineOS 0.0.1 (trixie)
+  Version                        0.1.0
+  Distribution                   FluorineOS 0.1.0 (trixie)
   Base                           trixie
 
 Session

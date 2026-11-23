@@ -136,12 +136,12 @@ export function Navbar() {
             <span>GitHub</span>
           </a>
           <a
-            href="https://github.com/FluorineOS/fluorine/releases/tag/v0.0.1"
+            href="https://github.com/FluorineOS/fluorine/releases/tag/v0.1.0"
             className="inline-flex items-center gap-2 bg-accent px-3.5 py-2 text-[12px] font-semibold text-canvas transition-colors hover:bg-accent-hover"
           >
             <IconDownload className="h-3.5 w-3.5" />
             <span>
-              Download<span className="hidden sm:inline"> 0.0.1</span>
+              Download<span className="hidden sm:inline"> 0.1.0</span>
             </span>
           </a>
           <button

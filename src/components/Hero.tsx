@@ -39,7 +39,7 @@ export function Hero() {
         <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
           <p className="inline-flex items-center gap-2 border-[1.5px] border-hairline bg-surface px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-primary">
             <span aria-hidden="true" className="h-1.5 w-1.5 bg-accent" />
-            Release 0.0.1
+            Release 0.1.0
           </p>
 
           <h1
@@ -69,11 +69,11 @@ export function Hero() {
 
           <div className="mt-9 flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center">
             <Link
-              href="https://github.com/FluorineOS/fluorine/releases/tag/v0.0.1"
+              href="https://github.com/FluorineOS/fluorine/releases/tag/v0.1.0"
               className="inline-flex items-center justify-center gap-2 bg-accent px-5 py-3 text-sm font-semibold text-canvas transition-colors hover:bg-accent-hover"
             >
               <IconDownload className="h-4 w-4" />
-              <span>Download ISO 0.0.1</span>
+              <span>Download ISO 0.1.0</span>
             </Link>
 
             <Link
