@@ -17,6 +17,13 @@ export default function Home() {
       </a>
       <Navbar />
       <main id="main" className="flex-1">
+        <div className="mt-6 text-center">
+          <img
+            src="/fluorine-banner.png"
+            alt="FluorineOS"
+            className="h-auto w-max max-w-full mx-auto object-contain"
+          />
+        </div>
         <Hero />
         <Qualities />
         <Keybindings />
