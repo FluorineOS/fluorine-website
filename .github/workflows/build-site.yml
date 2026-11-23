@@ -1,0 +1,48 @@
+name: Build site
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-site-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-site:
+    name: Lint and export the static site
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out the site source
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build the static export
+        run: npm run build
+
+      - name: Verify the export
+        run: |
+          set -euo pipefail
+          if [ ! -s out/index.html ]; then
+            printf 'out/index.html was not produced\n' >&2
+            exit 1
+          fi
+          printf 'exported %s file(s)\n' "$(find out -type f | wc -l)"
