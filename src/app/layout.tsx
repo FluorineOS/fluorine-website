@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   title,
   description,
   applicationName: "FluorineOS",
-  metadataBase: new URL("https://fluorineos.org"),
+  metadataBase: new URL("https://fluorineos.pages.dev"),
   alternates: {
     canonical: "/",
   },
@@ -34,25 +34,25 @@ export const metadata: Metadata = {
     title,
     description:
       "A clean, customizable Wayland workstation built on Debian 13 (Trixie) and Hyprland 0.55+. Cohesive out of the box, configured in readable plain text.",
-    url: "https://fluorineos.org",
+    url: "https://fluorineos.pages.dev",
     siteName: "FluorineOS",
     locale: "en_US",
     type: "website",
     images: [
       {
-        url: "/fluorine-logo.png",
-        width: 1254,
-        height: 1254,
+        url: "/fluorine-banner.png",
+        width: 3780,
+        height: 1890,
         alt: "FluorineOS",
       },
     ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title,
     description:
       "A clean, customizable Wayland workstation built on Debian 13 (Trixie) and Hyprland 0.55+.",
-    images: ["/fluorine-logo.png"],
+    images: ["/fluorine-banner.png"],
   },
   robots: {
     index: true,
