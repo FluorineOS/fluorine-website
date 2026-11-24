@@ -30,7 +30,9 @@ export function Navbar() {
   // Section anchors only exist on the landing page. From the documentation
   // pages they point back to the same sections on the home page.
   const onDocs = pathname.startsWith("/docs");
-  const sectionHref = (id: string) => `${onDocs ? "/" : ""}#${id}`;
+  const onChangelog = pathname.startsWith("/changelog");
+  const offHome = onDocs || onChangelog;
+  const sectionHref = (id: string) => `${offHome ? "/" : ""}#${id}`;
 
   useEffect(() => {
     const targets = scrollTargets
@@ -146,6 +148,23 @@ export function Navbar() {
                 />
               </Link>
             </li>
+            <li>
+              <Link
+                href="/changelog"
+                aria-current={onChangelog ? "page" : undefined}
+                className={`relative block py-2 text-[13px] font-medium transition-colors ${
+                  onChangelog ? "text-accent" : "text-muted hover:text-primary"
+                }`}
+              >
+                Changelog
+                <span
+                  aria-hidden="true"
+                  className={`absolute inset-x-0 -bottom-px h-[1.5px] transition-colors ${
+                    onChangelog ? "bg-accent" : "bg-transparent"
+                  }`}
+                />
+              </Link>
+            </li>
           </ul>
         </nav>
 
@@ -209,6 +228,18 @@ export function Navbar() {
                   }`}
                 >
                   Docs
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/changelog"
+                  onClick={() => setOpen(false)}
+                  aria-current={onChangelog ? "page" : undefined}
+                  className={`block py-3 text-sm font-medium transition-colors hover:text-accent ${
+                    onChangelog ? "text-accent" : "text-primary"
+                  }`}
+                >
+                  Changelog
                 </Link>
               </li>
             </ul>
