@@ -10,14 +10,14 @@ import { IconArrowRight, IconTerminal } from "@/components/Icons";
 export const metadata: Metadata = {
   title: "Documentation - FluorineOS",
   description:
-    "Installation, desktop workflow, customization, and recovery reference for FluorineOS 0.1.0 on Debian 13 and Hyprland.",
+    "Installation, desktop workflow, customization, and recovery reference for FluorineOS 0.2.0 on Debian 13 and Hyprland.",
   alternates: {
     canonical: "/docs",
   },
   openGraph: {
     title: "Documentation - FluorineOS",
     description:
-      "Installation, desktop workflow, customization, and recovery reference for FluorineOS 0.1.0.",
+      "Installation, desktop workflow, customization, and recovery reference for FluorineOS 0.2.0.",
     url: "https://fluorineos.pages.dev/docs",
     siteName: "FluorineOS",
     locale: "en_US",
@@ -179,7 +179,7 @@ export default function DocsPage() {
           </h1>
           <p className="mt-4 max-w-2xl text-pretty text-[15px] leading-[1.65] text-muted">
             Reference material for installing, running, customizing, and repairing
-            FluorineOS 0.1.0. Every command here matches the shipped image and the
+            FluorineOS 0.2.0. Every command here matches the shipped image and the
             packages in the official APT repository.
           </p>
         </div>
@@ -233,7 +233,18 @@ export default function DocsPage() {
                   </Prose>
                   <CodeBlock
                     label="Terminal"
-                    code={`sha256sum -c FluorineOS-0.1.0-amd64.iso.sha256`}
+                    code={`sha256sum -c FluorineOS-0.2.0-amd64.iso.sha256`}
+                  />
+                  <DataTable
+                    head={["Property", "Release value"]}
+                    rows={[
+                      ["Image file", "FluorineOS-0.2.0-amd64.iso"],
+                      ["Image size", "1390624768 bytes (1.30 GiB)"],
+                      [
+                        "SHA-256",
+                        "9b8c045e0a5d27cfd7d148a5ca720d7e59533c6eaa9d0b51f93ae3abd7fed780",
+                      ],
+                    ]}
                   />
                   <Prose>
                     <p>
@@ -256,7 +267,7 @@ export default function DocsPage() {
                   </Prose>
                   <CodeBlock
                     label="Terminal"
-                    code={`sudo dd if=FluorineOS-0.1.0-amd64.iso of=/dev/sdX bs=4M status=progress oflag=sync`}
+                    code={`sudo dd if=FluorineOS-0.2.0-amd64.iso of=/dev/sdX bs=4M status=progress oflag=sync`}
                   />
                   <Note title="Warning">
                     Writing to the wrong device destroys its contents irreversibly.

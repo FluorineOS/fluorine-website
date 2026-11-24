@@ -123,7 +123,7 @@ const steps: { label: string; title: string; description: string; command: strin
     title: "Verify the download",
     description:
       "Compare the image against the published checksum before writing it to removable media.",
-    command: "sha256sum -c FluorineOS-0.1.0-amd64.iso.sha256",
+    command: "sha256sum -c FluorineOS-0.2.0-amd64.iso.sha256",
   },
   {
     label: "Step 2",
@@ -131,7 +131,7 @@ const steps: { label: string; title: string; description: string; command: strin
     description:
       "Replace /dev/sdX with your target device. Everything on that device will be erased.",
     command:
-      "sudo dd if=FluorineOS-0.1.0-amd64.iso of=/dev/sdX bs=4M status=progress oflag=sync",
+      "sudo dd if=FluorineOS-0.2.0-amd64.iso of=/dev/sdX bs=4M status=progress oflag=sync",
   },
   {
     label: "Step 3",
@@ -158,10 +158,10 @@ sudo apt-get update && sudo apt-get install -y fluorine-desktop`,
 ];
 
 const releaseImage = {
-  version: "0.1.0",
-  name: "FluorineOS-0.1.0-amd64.iso",
-  size: "1.30 GiB (1390505984 bytes)",
-  digest: "96e9114ed09c6e82629725d2fc092205fcb22e6d10979b05e28e9101e788672f",
+  version: "0.2.0",
+  name: "FluorineOS-0.2.0-amd64.iso",
+  size: "1.30 GiB (1390624768 bytes)",
+  digest: "9b8c045e0a5d27cfd7d148a5ca720d7e59533c6eaa9d0b51f93ae3abd7fed780",
 };
 
 export function ArchitectureInstall() {
@@ -219,7 +219,7 @@ export function ArchitectureInstall() {
               </p>
             </div>
             <Link
-              href="https://github.com/FluorineOS/fluorine/releases/tag/v0.1.0"
+              href="https://github.com/FluorineOS/fluorine/releases/tag/v0.2.0"
               className="inline-flex shrink-0 items-center justify-center gap-2 border-[1.5px] border-hairline bg-surface px-3 py-2 text-[12px] font-medium text-primary transition-colors hover:border-accent"
             >
               <IconDownload className="h-3.5 w-3.5" />

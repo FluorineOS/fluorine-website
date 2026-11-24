@@ -75,6 +75,6 @@ This repository is part of the FluorineOS project and is released under the MIT
 License. See [LICENSE](LICENSE) for the full text.
 
 [main]: https://github.com/FluorineOS/fluorine
-[releases]: https://github.com/FluorineOS/fluorine/releases/tag/v0.1.0
+[releases]: https://github.com/FluorineOS/fluorine/releases/tag/v0.2.0
 [apt]: https://fluorineos.github.io/apt-repo
 [issues]: https://github.com/FluorineOS/fluorine/issues

@@ -4,7 +4,7 @@ import { IconArrowUp } from "./Icons";
 
 const links = [
   { label: "GitHub", href: "https://github.com/FluorineOS/fluorine" },
-  { label: "Releases", href: "https://github.com/FluorineOS/fluorine/releases/tag/v0.1.0" },
+  { label: "Releases", href: "https://github.com/FluorineOS/fluorine/releases/tag/v0.2.0" },
   { label: "APT repository", href: "https://fluorineos.github.io/apt-repo" },
   { label: "Issues", href: "https://github.com/FluorineOS/fluorine/issues" },
 ];
