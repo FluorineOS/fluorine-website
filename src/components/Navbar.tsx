@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { IconClose, IconDownload, IconGithub, IconMenu } from "./Icons";
 
 const navLinks = [
@@ -22,8 +23,14 @@ const scrollTargets = ["preview", "qualities", "keybindings", "architecture"];
 const ACTIVE_LINE = 96;
 
 export function Navbar() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("");
+
+  // Section anchors only exist on the landing page. From the documentation
+  // pages they point back to the same sections on the home page.
+  const onDocs = pathname.startsWith("/docs");
+  const sectionHref = (id: string) => `${onDocs ? "/" : ""}#${id}`;
 
   useEffect(() => {
     const targets = scrollTargets
@@ -103,7 +110,7 @@ export function Navbar() {
               return (
                 <li key={link.id}>
                   <a
-                    href={`#${link.id}`}
+                    href={sectionHref(link.id)}
                     aria-current={isActive ? "true" : undefined}
                     className={`relative block py-2 text-[13px] font-medium transition-colors ${
                       isActive
@@ -122,6 +129,23 @@ export function Navbar() {
                 </li>
               );
             })}
+            <li>
+              <Link
+                href="/docs"
+                aria-current={onDocs ? "page" : undefined}
+                className={`relative block py-2 text-[13px] font-medium transition-colors ${
+                  onDocs ? "text-accent" : "text-muted hover:text-primary"
+                }`}
+              >
+                Docs
+                <span
+                  aria-hidden="true"
+                  className={`absolute inset-x-0 -bottom-px h-[1.5px] transition-colors ${
+                    onDocs ? "bg-accent" : "bg-transparent"
+                  }`}
+                />
+              </Link>
+            </li>
           </ul>
         </nav>
 
@@ -167,7 +191,7 @@ export function Navbar() {
               {navLinks.map((link) => (
                 <li key={link.id}>
                   <a
-                    href={`#${link.id}`}
+                    href={sectionHref(link.id)}
                     onClick={() => setOpen(false)}
                     className="block py-3 text-sm font-medium text-primary transition-colors hover:text-accent"
                   >
@@ -175,6 +199,18 @@ export function Navbar() {
                   </a>
                 </li>
               ))}
+              <li>
+                <Link
+                  href="/docs"
+                  onClick={() => setOpen(false)}
+                  aria-current={onDocs ? "page" : undefined}
+                  className={`block py-3 text-sm font-medium transition-colors hover:text-accent ${
+                    onDocs ? "text-accent" : "text-primary"
+                  }`}
+                >
+                  Docs
+                </Link>
+              </li>
             </ul>
             <div className="flex flex-col gap-2 pb-4 pt-3 sm:hidden">
               <a
