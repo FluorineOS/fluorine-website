@@ -139,8 +139,8 @@ const steps: { label: string; title: string; description: string; command: strin
     description:
       "Optional. Install the desktop stack on an existing trixie system instead of reinstalling.",
     command: `# Download the archive signing key
-curl -fsSLo /tmp/fluorineos-archive-keyring.gpg https://fluorineos.github.io/apt-repo/fluorineos-archive-keyring.gpg
-sudo install -m 0644 /tmp/fluorineos-archive-keyring.gpg /usr/share/keyrings/fluorineos-archive-keyring.gpg
+curl -fsSLo /tmp/fluorineos-archive-keyring.asc https://fluorineos.github.io/apt-repo/fluorineos-archive-keyring.asc
+sudo install -m 0644 /tmp/fluorineos-archive-keyring.asc /usr/share/keyrings/fluorineos-archive-keyring.asc
 
 # Configure the deb822 source
 sudo tee /etc/apt/sources.list.d/fluorineos.sources << 'EOF'
@@ -149,7 +149,7 @@ URIs: https://fluorineos.github.io/apt-repo
 Suites: trixie
 Components: main
 Architectures: amd64
-Signed-By: /usr/share/keyrings/fluorineos-archive-keyring.gpg
+Signed-By: /usr/share/keyrings/fluorineos-archive-keyring.asc
 EOF
 
 # Refresh the package index and install the desktop stack
