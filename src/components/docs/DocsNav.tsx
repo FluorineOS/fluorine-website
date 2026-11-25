@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface DocLink {
   id: string;
@@ -66,9 +66,58 @@ export const docGroups: DocGroup[] = [
 // Offset of the sticky header plus breathing room, matching the landing page.
 const ACTIVE_LINE = 96;
 
-export function DocsNav() {
-  const [active, setActive] = useState<string>(docGroups[0].id);
+// A sidebar click scrolls smoothly through every heading on the way to its
+// target. The observer stays quiet for this long so the pill does not flicker
+// onto the intermediate sections while the page is moving.
+const CLICK_LOCK_MS = 650;
 
+const firstSection = docGroups[0].id;
+
+const linkBase =
+  "flex w-full items-center justify-between px-3 py-2 rounded-md border-[1.5px] transition-colors";
+const linkActive = "border-[#1C2229] bg-[#0A0D10] text-[#B4F03A]";
+const linkIdle =
+  "border-transparent text-[#94A3B8] hover:border-[#1C2229] hover:bg-[#0A0D10] hover:text-primary";
+
+const knownIds = new Set(
+  docGroups.flatMap((group) => [
+    group.id,
+    ...group.links.map((link) => link.id),
+  ]),
+);
+
+function indicator() {
+  return (
+    <span
+      aria-hidden="true"
+      className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#B4F03A]"
+    />
+  );
+}
+
+export function DocsNav() {
+  const [activeSection, setActiveSection] = useState<string>(firstSection);
+  const isClickScrollingRef = useRef(false);
+  const lockTimerRef = useRef<number | null>(null);
+
+  // Start from the deep link when the page is opened with a hash. The read is
+  // deferred one frame so the initial paint uses the server-rendered entry and
+  // the hash only corrects it after hydration.
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      const fromHash = window.location.hash.replace(/^#/, "");
+
+      if (fromHash && knownIds.has(fromHash)) {
+        setActiveSection(fromHash);
+      }
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
+
+  // Scroll-spy: the observer only fires when a target crosses the sticky
+  // header line, and the exact active entry is recomputed from the document,
+  // so the highlight matches the geometry the user actually sees.
   useEffect(() => {
     const targets = docGroups
       .flatMap((group) => [
@@ -88,8 +137,12 @@ export function DocsNav() {
     }
 
     const update = () => {
+      if (isClickScrollingRef.current) {
+        return;
+      }
+
       const line = window.scrollY + ACTIVE_LINE;
-      let current = docGroups[0].id;
+      let current = firstSection;
 
       for (const target of targets) {
         const top = target.element.getBoundingClientRect().top + window.scrollY;
@@ -99,24 +152,50 @@ export function DocsNav() {
         }
       }
 
-      setActive(current);
+      setActiveSection((previous) => (previous === current ? previous : current));
     };
 
     update();
-    window.addEventListener("scroll", update, { passive: true });
+
+    const observer = new IntersectionObserver(update, {
+      rootMargin: `-${ACTIVE_LINE}px 0px -60% 0px`,
+      threshold: 0,
+    });
+
+    for (const target of targets) {
+      observer.observe(target.element);
+    }
+
     window.addEventListener("resize", update);
 
     return () => {
-      window.removeEventListener("scroll", update);
+      observer.disconnect();
       window.removeEventListener("resize", update);
     };
   }, []);
 
-  const activeGroup =
-    docGroups.find(
-      (group) =>
-        active === group.id || group.links.some((link) => link.id === active),
-    ) ?? docGroups[0];
+  useEffect(
+    () => () => {
+      if (lockTimerRef.current !== null) {
+        window.clearTimeout(lockTimerRef.current);
+      }
+    },
+    [],
+  );
+
+  const handleClick = useCallback((id: string) => {
+    setActiveSection(id);
+    isClickScrollingRef.current = true;
+
+    if (lockTimerRef.current !== null) {
+      window.clearTimeout(lockTimerRef.current);
+    }
+
+    lockTimerRef.current = window.setTimeout(() => {
+      isClickScrollingRef.current = false;
+      lockTimerRef.current = null;
+    }, CLICK_LOCK_MS);
+  }, []);
 
   return (
     <nav aria-label="Documentation sections">
@@ -124,43 +203,45 @@ export function DocsNav() {
         Contents
       </p>
 
-      <ul className="mt-4 flex gap-2 overflow-x-auto pb-2 lg:block lg:gap-0 lg:overflow-visible lg:pb-0">
+      <ul className="mt-4 flex gap-2 overflow-x-auto pb-2 lg:block lg:space-y-1 lg:overflow-visible lg:pb-0">
         {docGroups.map((group) => {
-          const isGroupActive = activeGroup.id === group.id;
+          const isGroupActive = activeSection === group.id;
 
           return (
             <li key={group.id} className="shrink-0 lg:shrink">
               <a
                 href={`#${group.id}`}
+                onClick={() => handleClick(group.id)}
                 aria-current={isGroupActive ? "true" : undefined}
-                className={`flex items-baseline gap-2 whitespace-nowrap border-l-[1.5px] py-1.5 pl-3 text-[13px] leading-[1.65] transition-colors lg:whitespace-normal ${
-                  isGroupActive
-                    ? "border-accent text-accent"
-                    : "border-hairline text-muted hover:border-muted hover:text-primary"
+                className={`flex w-auto items-center justify-between gap-2 whitespace-nowrap rounded-md border-[1.5px] px-3 py-2 text-[13px] leading-[1.65] transition-colors lg:w-full lg:whitespace-normal ${
+                  isGroupActive ? linkActive : linkIdle
                 }`}
               >
-                <span className="font-mono text-[10px] tracking-[0.14em]">
-                  {group.index}
+                <span className="flex items-baseline gap-2">
+                  <span className="font-mono text-[10px] tracking-[0.14em]">
+                    {group.index}
+                  </span>
+                  <span>{group.label}</span>
                 </span>
-                <span>{group.label}</span>
+                {isGroupActive ? indicator() : null}
               </a>
 
-              <ul className="hidden lg:mt-1 lg:block lg:pb-3">
+              <ul className="hidden lg:mt-1 lg:block lg:space-y-1 lg:pb-2">
                 {group.links.map((link) => {
-                  const isActive = active === link.id;
+                  const isActive = activeSection === link.id;
 
                   return (
                     <li key={link.id}>
                       <a
                         href={`#${link.id}`}
+                        onClick={() => handleClick(link.id)}
                         aria-current={isActive ? "true" : undefined}
-                        className={`block border-l-[1.5px] py-1 pl-5 text-[12.5px] leading-[1.65] transition-colors ${
-                          isActive
-                            ? "border-accent text-accent"
-                            : "border-hairline text-muted hover:text-primary"
+                        className={`${linkBase} text-[12.5px] leading-[1.65] ${
+                          isActive ? linkActive : linkIdle
                         }`}
                       >
-                        {link.label}
+                        <span>{link.label}</span>
+                        {isActive ? indicator() : null}
                       </a>
                     </li>
                   );

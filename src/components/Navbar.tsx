@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -15,9 +15,9 @@ const navLinks = [
   { id: "install", label: "Install" },
 ];
 
-// The install anchor lives inside the architecture section, so it is not a
-// scroll target of its own. Observing it made the section highlight flip to
-// "Install" as soon as the architecture section reached the viewport.
+// The install anchor lives inside the architecture section, so it is not part
+// of the section scroll-spy. It is tracked separately by its own observer so
+// the two highlights never compete for the same click.
 const scrollTargets = [
   "preview",
   "qualities",
@@ -29,25 +29,70 @@ const scrollTargets = [
 // Offset of the sticky header plus a small breathing room.
 const ACTIVE_LINE = 96;
 
+// A click on Install scrolls smoothly to the section. The observer is ignored
+// for this long so its first "not visible yet" callback cannot clear the pill
+// while the page is still scrolling.
+const INSTALL_LOCK_MS = 700;
+
+// Every entry reserves the border box in both states, so switching the pill on
+// and off never changes the width, height, or baseline of the row.
+const pillBase =
+  "inline-flex items-center whitespace-nowrap rounded-md border-[1.5px] px-3 py-1.5 text-[13px] font-medium transition-colors";
+const pillActive = "border-hairline bg-surface text-accent";
+const pillIdle =
+  "border-transparent text-muted hover:border-hairline hover:bg-surface hover:text-primary";
+
+// Held at module scope so the click handler and the observer share one lock
+// without reading a clock during render.
+function lockInstall(lockRef: { current: boolean }) {
+  lockRef.current = true;
+  window.setTimeout(() => {
+    lockRef.current = false;
+  }, INSTALL_LOCK_MS);
+}
+
 export function Navbar() {
   const pathname = usePathname();
+  // trailingSlash is enabled, so usePathname() can return "/docs/" and the
+  // comparisons below would miss. Normalize once and compare cleanly.
+  const cleanPath = (pathname || "/").replace(/\/$/, "") || "/";
+
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("");
+  const [activeHash, setActiveHash] = useState("");
+  const installLockRef = useRef(false);
 
   // Section anchors only exist on the landing page. From the documentation
   // pages they point back to the same sections on the home page.
-  const onDocs = pathname.startsWith("/docs");
-  const onChangelog = pathname.startsWith("/changelog");
+  const onDocs = cleanPath === "/docs";
+  const onChangelog = cleanPath === "/changelog";
+  const onHome = cleanPath === "/";
   const offHome = onDocs || onChangelog;
   const sectionHref = (id: string) => `${offHome ? "/" : ""}#${id}`;
 
+  // Load the hash on mount and keep it in step with the address bar.
+  useEffect(() => {
+    const sync = () => setActiveHash(window.location.hash.replace(/^#/, ""));
+
+    sync();
+    window.addEventListener("hashchange", sync);
+    window.addEventListener("popstate", sync);
+
+    return () => {
+      window.removeEventListener("hashchange", sync);
+      window.removeEventListener("popstate", sync);
+    };
+  }, []);
+
+  // Section scroll-spy. The install anchor is deliberately not a target here.
   useEffect(() => {
     const targets = scrollTargets
       .map((id) => document.getElementById(id))
       .filter((element): element is HTMLElement => element !== null);
 
     if (targets.length === 0) {
-      return;
+      const frame = window.requestAnimationFrame(() => setActive(""));
+      return () => window.cancelAnimationFrame(frame);
     }
 
     const update = () => {
@@ -73,7 +118,42 @@ export function Navbar() {
       window.removeEventListener("scroll", update);
       window.removeEventListener("resize", update);
     };
-  }, []);
+  }, [cleanPath]);
+
+  // Scrolling into or out of the install section updates the pill without a
+  // click, and the lock keeps the two paths from overriding each other.
+  useEffect(() => {
+    if (!onHome) {
+      return;
+    }
+
+    const install = document.getElementById("install");
+
+    if (!install) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (installLockRef.current) {
+          return;
+        }
+
+        const entry = entries[0];
+
+        if (entry.isIntersecting) {
+          setActiveHash("install");
+        } else {
+          setActiveHash((current) => (current === "install" ? "" : current));
+        }
+      },
+      { rootMargin: `-${ACTIVE_LINE}px 0px 0px 0px`, threshold: 0 },
+    );
+
+    observer.observe(install);
+
+    return () => observer.disconnect();
+  }, [onHome]);
 
   useEffect(() => {
     if (!open) {
@@ -90,11 +170,33 @@ export function Navbar() {
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [open]);
 
+  const clearHash = () => {
+    installLockRef.current = false;
+    setActiveHash("");
+  };
+
+  const handleSectionClick = (id: string) => {
+    if (id === "install") {
+      lockInstall(installLockRef);
+      setActiveHash("install");
+      return;
+    }
+
+    installLockRef.current = false;
+    setActiveHash("");
+  };
+
+  // The install pill wins while it is active, so a smooth scroll past the
+  // architecture heading never shows two active entries at once.
+  const activeId = activeHash === "install" ? "install" : active;
+  const isActive = (id: string) => activeId === id;
+
   return (
     <header className="sticky top-0 z-50 border-b-[1.5px] border-hairline bg-canvas">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-5 sm:px-6 lg:px-8">
         <Link
           href="/"
+          onClick={clearHash}
           className="flex shrink-0 items-center gap-2"
           aria-label="FluorineOS home"
         >
@@ -111,65 +213,38 @@ export function Navbar() {
           </span>
         </Link>
 
-        <nav aria-label="Sections" className="hidden md:block">
-          <ul className="flex items-center gap-7">
-            {navLinks.map((link) => {
-              const isActive = active === link.id;
-
-              return (
-                <li key={link.id}>
-                  <a
-                    href={sectionHref(link.id)}
-                    aria-current={isActive ? "true" : undefined}
-                    className={`relative block py-2 text-[13px] font-medium transition-colors ${
-                      isActive
-                        ? "text-accent"
-                        : "text-muted hover:text-primary"
-                    }`}
-                  >
-                    {link.label}
-                    <span
-                      aria-hidden="true"
-                      className={`absolute inset-x-0 -bottom-px h-[1.5px] transition-colors ${
-                        isActive ? "bg-accent" : "bg-transparent"
-                      }`}
-                    />
-                  </a>
-                </li>
-              );
-            })}
+        <nav aria-label="Sections" className="hidden lg:block">
+          <ul className="flex items-center gap-1 xl:gap-2">
+            {navLinks.map((link) => (
+              <li key={link.id}>
+                <a
+                  href={sectionHref(link.id)}
+                  onClick={() => handleSectionClick(link.id)}
+                  aria-current={isActive(link.id) ? "true" : undefined}
+                  className={`${pillBase} ${isActive(link.id) ? pillActive : pillIdle}`}
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
             <li>
               <Link
                 href="/docs"
+                onClick={clearHash}
                 aria-current={onDocs ? "page" : undefined}
-                className={`relative block py-2 text-[13px] font-medium transition-colors ${
-                  onDocs ? "text-accent" : "text-muted hover:text-primary"
-                }`}
+                className={`${pillBase} ${onDocs ? pillActive : pillIdle}`}
               >
                 Docs
-                <span
-                  aria-hidden="true"
-                  className={`absolute inset-x-0 -bottom-px h-[1.5px] transition-colors ${
-                    onDocs ? "bg-accent" : "bg-transparent"
-                  }`}
-                />
               </Link>
             </li>
             <li>
               <Link
                 href="/changelog"
+                onClick={clearHash}
                 aria-current={onChangelog ? "page" : undefined}
-                className={`relative block py-2 text-[13px] font-medium transition-colors ${
-                  onChangelog ? "text-accent" : "text-muted hover:text-primary"
-                }`}
+                className={`${pillBase} ${onChangelog ? pillActive : pillIdle}`}
               >
                 Changelog
-                <span
-                  aria-hidden="true"
-                  className={`absolute inset-x-0 -bottom-px h-[1.5px] transition-colors ${
-                    onChangelog ? "bg-accent" : "bg-transparent"
-                  }`}
-                />
               </Link>
             </li>
           </ul>
@@ -200,7 +275,7 @@ export function Navbar() {
             aria-expanded={open}
             aria-controls="mobile-navigation"
             aria-label={open ? "Close navigation menu" : "Open navigation menu"}
-            className="flex h-10 w-10 items-center justify-center border-[1.5px] border-hairline bg-surface text-primary transition-colors hover:border-accent md:hidden"
+            className="flex h-10 w-10 items-center justify-center border-[1.5px] border-hairline bg-surface text-primary transition-colors hover:border-accent lg:hidden"
           >
             {open ? <IconClose /> : <IconMenu />}
           </button>
@@ -210,16 +285,22 @@ export function Navbar() {
       {open ? (
         <div
           id="mobile-navigation"
-          className="border-t-[1.5px] border-hairline bg-canvas md:hidden"
+          className="border-t-[1.5px] border-hairline bg-canvas lg:hidden"
         >
           <nav aria-label="Sections" className="mx-auto max-w-7xl px-5 py-2 sm:px-6">
-            <ul className="[&>li+li]:border-t-[1.5px] [&>li+li]:border-hairline">
+            <ul className="flex flex-col gap-1 py-2">
               {navLinks.map((link) => (
                 <li key={link.id}>
                   <a
                     href={sectionHref(link.id)}
-                    onClick={() => setOpen(false)}
-                    className="block py-3 text-sm font-medium text-primary transition-colors hover:text-accent"
+                    onClick={() => {
+                      handleSectionClick(link.id);
+                      setOpen(false);
+                    }}
+                    aria-current={isActive(link.id) ? "true" : undefined}
+                    className={`flex w-full items-center rounded-md border-[1.5px] px-3 py-2 text-sm font-medium transition-colors ${
+                      isActive(link.id) ? pillActive : pillIdle
+                    }`}
                   >
                     {link.label}
                   </a>
@@ -228,10 +309,13 @@ export function Navbar() {
               <li>
                 <Link
                   href="/docs"
-                  onClick={() => setOpen(false)}
+                  onClick={() => {
+                    clearHash();
+                    setOpen(false);
+                  }}
                   aria-current={onDocs ? "page" : undefined}
-                  className={`block py-3 text-sm font-medium transition-colors hover:text-accent ${
-                    onDocs ? "text-accent" : "text-primary"
+                  className={`flex w-full items-center rounded-md border-[1.5px] px-3 py-2 text-sm font-medium transition-colors ${
+                    onDocs ? pillActive : pillIdle
                   }`}
                 >
                   Docs
@@ -240,17 +324,20 @@ export function Navbar() {
               <li>
                 <Link
                   href="/changelog"
-                  onClick={() => setOpen(false)}
+                  onClick={() => {
+                    clearHash();
+                    setOpen(false);
+                  }}
                   aria-current={onChangelog ? "page" : undefined}
-                  className={`block py-3 text-sm font-medium transition-colors hover:text-accent ${
-                    onChangelog ? "text-accent" : "text-primary"
+                  className={`flex w-full items-center rounded-md border-[1.5px] px-3 py-2 text-sm font-medium transition-colors ${
+                    onChangelog ? pillActive : pillIdle
                   }`}
                 >
                   Changelog
                 </Link>
               </li>
             </ul>
-            <div className="flex flex-col gap-2 pb-4 pt-3 sm:hidden">
+            <div className="flex flex-col gap-2 pb-4 pt-1 sm:hidden">
               <a
                 href="https://github.com/FluorineOS/fluorine"
                 target="_blank"

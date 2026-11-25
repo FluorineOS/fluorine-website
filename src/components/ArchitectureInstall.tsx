@@ -210,7 +210,7 @@ export function ArchitectureInstall() {
           </div>
         </div>
 
-        <div id="install" className="scroll-mt-20 lg:col-span-7">
+        <div id="install" className="scroll-mt-24 lg:col-span-7">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h3 className="text-lg font-semibold text-primary">Installation</h3>
