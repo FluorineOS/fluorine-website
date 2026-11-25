@@ -8,6 +8,7 @@ import {
   IconCopy,
   IconCpu,
   IconDownload,
+  IconGithub,
   IconTerminal,
 } from "./Icons";
 
@@ -157,6 +158,24 @@ sudo apt-get update && sudo apt-get install -y fluorine-desktop`,
   },
 ];
 
+const flintSteps: { title: string; description: string }[] = [
+  {
+    title: "Download Flint",
+    description:
+      "Get flint.exe from the release page or open flintweb.vercel.app. It is a portable build, so there is nothing to install.",
+  },
+  {
+    title: "Drop the image onto Flint",
+    description:
+      "Drag FluorineOS-0.2.0-amd64.iso into the window. Flint computes its SHA-256 checksum before anything touches a drive.",
+  },
+  {
+    title: "Pick the drive and flash",
+    description:
+      "Select the target USB drive and type its serial to confirm. Flint writes the image, then reads every byte back and verifies it against the checksum.",
+  },
+];
+
 const releaseImage = {
   version: "0.2.0",
   name: "FluorineOS-0.2.0-amd64.iso",
@@ -267,6 +286,76 @@ export function ArchitectureInstall() {
               </article>
             ))}
           </div>
+
+          <aside
+            aria-labelledby="flint-title"
+            className="relative mt-8 overflow-hidden border-[1.5px] border-hairline bg-surface p-5 pl-7 sm:p-6 sm:pl-8"
+          >
+            <span
+              aria-hidden="true"
+              className="absolute inset-y-0 left-0 w-[3px] bg-accent"
+            />
+            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-accent">
+              Recommended on Windows
+            </p>
+            <h4
+              id="flint-title"
+              className="mt-2 text-[15px] font-semibold text-primary"
+            >
+              FluorineOS recommends Flint for writing USB media
+            </h4>
+            <p className="mt-2 text-[13px] leading-[1.65] text-muted">
+              Flint is our native Windows companion: a PyQt6 application that
+              talks to the drive through Win32 disk I/O with unbuffered writes,
+              then reads it back and compares every byte against a SHA-256
+              digest of the image. It runs as a portable executable, needs no
+              installation, and refuses to touch a drive until you type the
+              serial of the one you selected.
+            </p>
+
+            <ol className="mt-4 space-y-3">
+              {flintSteps.map((step, index) => (
+                <li key={step.title} className="flex gap-3">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center border-[1.5px] border-hairline bg-canvas font-mono text-[10px] text-accent">
+                    {index + 1}
+                  </span>
+                  <div>
+                    <p className="text-[13px] font-semibold text-primary">
+                      {step.title}
+                    </p>
+                    <p className="mt-0.5 text-[12.5px] leading-[1.6] text-muted">
+                      {step.description}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+
+            <div className="mt-5 flex flex-wrap gap-2">
+              <a
+                href="https://flintweb.vercel.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-accent px-3 py-2 text-[12px] font-semibold text-canvas transition-colors hover:bg-accent-hover"
+              >
+                <IconDownload className="h-3.5 w-3.5" />
+                <span>Get Flint</span>
+              </a>
+              <a
+                href="https://github.com/flintusb/Flint"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 border-[1.5px] border-hairline bg-canvas px-3 py-2 text-[12px] font-medium text-primary transition-colors hover:border-accent"
+              >
+                <IconGithub className="h-3.5 w-3.5" />
+                <span>Source on GitHub</span>
+              </a>
+            </div>
+
+            <p className="mt-3 font-mono text-[10px] leading-[1.6] text-muted">
+              flintweb.vercel.app / github.com/flintusb/Flint
+            </p>
+          </aside>
         </div>
       </div>
     </Section>
