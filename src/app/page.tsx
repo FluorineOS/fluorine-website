@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { Qualities } from "@/components/Qualities";
+import { InterfaceTour } from "@/components/InterfaceTour";
 import { Keybindings } from "@/components/Keybindings";
 import { ArchitectureInstall } from "@/components/ArchitectureInstall";
 import { Repositories } from "@/components/Repositories";
@@ -19,6 +20,7 @@ export default function Home() {
       <main id="main" className="flex-1">
         <Hero />
         <Qualities />
+        <InterfaceTour />
         <Keybindings />
         <ArchitectureInstall />
         <Repositories />

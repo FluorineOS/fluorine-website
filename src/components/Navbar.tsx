@@ -9,6 +9,7 @@ import { IconClose, IconDownload, IconGithub, IconMenu } from "./Icons";
 const navLinks = [
   { id: "preview", label: "Preview" },
   { id: "qualities", label: "Qualities" },
+  { id: "interface", label: "Interface" },
   { id: "keybindings", label: "Keybindings" },
   { id: "architecture", label: "Architecture" },
   { id: "install", label: "Install" },
@@ -17,7 +18,13 @@ const navLinks = [
 // The install anchor lives inside the architecture section, so it is not a
 // scroll target of its own. Observing it made the section highlight flip to
 // "Install" as soon as the architecture section reached the viewport.
-const scrollTargets = ["preview", "qualities", "keybindings", "architecture"];
+const scrollTargets = [
+  "preview",
+  "qualities",
+  "interface",
+  "keybindings",
+  "architecture",
+];
 
 // Offset of the sticky header plus a small breathing room.
 const ACTIVE_LINE = 96;
