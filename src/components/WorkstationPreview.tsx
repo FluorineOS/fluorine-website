@@ -376,8 +376,12 @@ export function WorkstationPreview() {
             </p>
           </div>
 
-          {/* Desktop canvas: the mock windows react to the selected profile. */}
-          <div className="relative flex min-h-[340px] flex-col justify-between bg-canvas p-3 sm:min-h-[380px]">
+          {/* Desktop canvas: the shipped wall1.png wallpaper sits behind the
+              mock windows, and the windows react to the selected profile. */}
+          <div
+            className="relative flex min-h-[340px] flex-col justify-between bg-canvas bg-cover bg-center p-3 sm:min-h-[380px]"
+            style={{ backgroundImage: "url('/screenshots/wall1.png')" }}
+          >
             <div
               className="grid flex-1 grid-cols-1 gap-2 transition-all duration-300 sm:grid-cols-2"
               style={{
