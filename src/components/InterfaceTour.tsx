@@ -55,11 +55,14 @@ export function InterfaceTour() {
   const [activeId, setActiveId] = useState(shots[0].id);
   const active = shots.find((shot) => shot.id === activeId) ?? shots[0];
 
+  const select = (index: number) => {
+    setActiveId(shots[index].id);
+    document.getElementById(`tour-tab-${shots[index].id}`)?.focus();
+  };
+
   const step = (direction: 1 | -1) => {
     const index = shots.findIndex((shot) => shot.id === activeId);
-    const next = (index + direction + shots.length) % shots.length;
-    setActiveId(shots[next].id);
-    document.getElementById(`tour-tab-${shots[next].id}`)?.focus();
+    select((index + direction + shots.length) % shots.length);
   };
 
   return (
@@ -80,6 +83,12 @@ export function InterfaceTour() {
           } else if (event.key === "ArrowLeft") {
             event.preventDefault();
             step(-1);
+          } else if (event.key === "Home") {
+            event.preventDefault();
+            select(0);
+          } else if (event.key === "End") {
+            event.preventDefault();
+            select(shots.length - 1);
           }
         }}
       >
@@ -120,6 +129,7 @@ export function InterfaceTour() {
       <div
         id="tour-panel"
         role="tabpanel"
+        tabIndex={0}
         aria-labelledby={`tour-tab-${active.id}`}
         className="mt-4"
       >
