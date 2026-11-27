@@ -360,12 +360,13 @@ const LightRays = ({
       const s = settingsRef.current;
       const dt = clamp((now - last) / 1000 || 0, 0, 0.05);
       last = Math.max(last, now);
-      time += dt * s.speed * (reduced ? 0.35 : 1);
+      if (!reduced) time += dt * s.speed;
       if (opening < 1) opening = Math.min(1, opening + dt / 1.8);
 
       const steer = 1 - Math.exp(-dt / 0.2);
-      const aimX = s.follow && pointer.seen ? pointer.x : 0.5;
-      const aimY = s.follow && pointer.seen ? pointer.y : 0.5;
+      const follow = s.follow && !reduced;
+      const aimX = follow && pointer.seen ? pointer.x : 0.5;
+      const aimY = follow && pointer.seen ? pointer.y : 0.5;
       aim.x += (aimX - aim.x) * steer;
       aim.y += (aimY - aim.y) * steer;
       const glide = 1 - Math.exp(-dt / 0.08);
@@ -394,7 +395,7 @@ const LightRays = ({
       const sin = Math.sin(s.tilt);
       let dirX = s.origin.dir[0] * cos - s.origin.dir[1] * sin;
       let dirY = s.origin.dir[0] * sin + s.origin.dir[1] * cos;
-      if (s.follow && s.influence > 0) {
+      if (follow && s.influence > 0) {
         const mx = aim.x * width - sourceX;
         const my = aim.y * height - sourceY;
         const ml = Math.hypot(mx, my) || 1;
@@ -445,7 +446,7 @@ const LightRays = ({
         (shade.presence > 1e-3 && Math.abs(shade.x - pointer.x) + Math.abs(shade.y - pointer.y) > 1e-4) ||
         Math.abs((shading ? 1 : 0) - shade.presence) > 1e-3 ||
         pulses.length > 0;
-      const busy = s.speed > 0 || opening < 1 || settling;
+      const busy = (!reduced && s.speed > 0) || opening < 1 || settling;
       if (busy && visible && pageVisible) raf = requestAnimationFrame(frame);
     };
 
@@ -473,6 +474,7 @@ const LightRays = ({
     };
 
     const onPointerMove = event => {
+      if (reduced) return;
       const spot = locate(event);
       if (!pointer.inside && spot.inside) {
         shade.x = spot.x;
