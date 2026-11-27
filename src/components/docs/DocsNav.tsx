@@ -75,9 +75,9 @@ const firstSection = docGroups[0].id;
 
 const linkBase =
   "flex w-full items-center justify-between px-3 py-2 rounded-md border-[1.5px] transition-colors";
-const linkActive = "border-[#1C2229] bg-[#0A0D10] text-[#B4F03A]";
+const linkActive = "border-hairline bg-surface text-accent";
 const linkIdle =
-  "border-transparent text-[#94A3B8] hover:border-[#1C2229] hover:bg-[#0A0D10] hover:text-primary";
+  "border-transparent text-muted hover:border-hairline hover:bg-surface hover:text-primary";
 
 const knownIds = new Set(
   docGroups.flatMap((group) => [
@@ -90,7 +90,7 @@ function indicator() {
   return (
     <span
       aria-hidden="true"
-      className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#B4F03A]"
+      className="h-1.5 w-1.5 shrink-0 bg-accent"
     />
   );
 }
