@@ -17,6 +17,21 @@ export const metadata: Metadata = {
     siteName: "FluorineOS",
     locale: "en_US",
     type: "article",
+    images: [
+      {
+        url: "/fluorine-banner.png",
+        width: 3780,
+        height: 1890,
+        alt: "FluorineOS changelog",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Changelog - FluorineOS",
+    description:
+      "Release history for FluorineOS: the desktop, artwork, and installer changes shipped in each version.",
+    images: ["/fluorine-banner.png"],
   },
 };
 
