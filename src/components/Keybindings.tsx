@@ -119,7 +119,7 @@ export function Keybindings() {
         onChange={(event) => setQuery(event.target.value)}
         placeholder="Filter shortcuts..."
         autoComplete="off"
-        className="w-full appearance-none border-[1.5px] border-hairline bg-canvas py-2.5 pl-9 pr-9 font-mono text-xs text-primary transition-colors placeholder:text-muted focus:border-accent focus:outline-none"
+        className="w-full appearance-none border-[1.5px] border-hairline bg-canvas py-2.5 pl-9 pr-9 font-mono text-xs text-primary transition-colors placeholder:text-muted focus:border-accent"
       />
       {query ? (
         <button
@@ -212,7 +212,7 @@ export function Keybindings() {
             </table>
           </div>
 
-          <ul className="mt-4 space-y-3 lg:hidden">
+          <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:hidden">
             {filtered.map((item) => (
               <li
                 key={item.action}
