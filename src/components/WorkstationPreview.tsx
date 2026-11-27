@@ -458,7 +458,9 @@ export function WorkstationPreview() {
                   <br />
                   general:border_size {layout.border}
                   <br />
-                  general:gaps_out {mode === "PRESENT" ? 14 : layout.gaps}
+                  general:gaps_in {layout.gapInner}
+                  <br />
+                  general:gaps_out {layout.gapOuter}
                 </p>
               </div>
             </div>
