@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import type { KeyboardEvent, ReactNode } from "react";
 
 type DemoId = "ctl" | "mode" | "doctor" | "snapshot";
@@ -83,28 +83,32 @@ const snapshotSteps = [
 
 const modes: {
   name: ModeName;
-  gaps: number;
+  gapInner: number;
+  gapOuter: number;
   border: number;
   inactiveOpacity: number;
   summary: string;
 }[] = [
   {
     name: "WORK",
-    gaps: 8,
+    gapInner: 4,
+    gapOuter: 6,
     border: 2,
     inactiveOpacity: 1,
     summary: "Gaps 4/6, border 2px, Waybar visible, notifications on.",
   },
   {
     name: "FOCUS",
-    gaps: 0,
+    gapInner: 0,
+    gapOuter: 0,
     border: 1,
     inactiveOpacity: 0.85,
     summary: "No gaps, border 1px, Waybar hidden, do not disturb on.",
   },
   {
     name: "PRESENT",
-    gaps: 18,
+    gapInner: 4,
+    gapOuter: 14,
     border: 2,
     inactiveOpacity: 1,
     summary: "Outer gaps 14, full contrast, idle lock stopped, do not disturb on.",
@@ -136,10 +140,35 @@ function toneClass(tone: string) {
 
 // Types the lines out while mounted. Remounting through a key resets the
 // animation, which keeps the reset out of an effect body.
+const reducedMotionQuery = "(prefers-reduced-motion: reduce)";
+
+function subscribeToReducedMotion(onChange: () => void) {
+  const query = window.matchMedia(reducedMotionQuery);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+}
+
+function getReducedMotionSnapshot() {
+  return window.matchMedia(reducedMotionQuery).matches;
+}
+
+function getReducedMotionServerSnapshot() {
+  return false;
+}
+
 function TypedOutput({ lines, speed }: { lines: OutputLine[]; speed: number }) {
   const [shown, setShown] = useState(0);
+  const reducedMotion = useSyncExternalStore(
+    subscribeToReducedMotion,
+    getReducedMotionSnapshot,
+    getReducedMotionServerSnapshot,
+  );
 
   useEffect(() => {
+    if (reducedMotion) {
+      return;
+    }
+
     const timer = window.setInterval(() => {
       setShown((value) => {
         if (value >= lines.length) {
@@ -151,11 +180,13 @@ function TypedOutput({ lines, speed }: { lines: OutputLine[]; speed: number }) {
     }, speed);
 
     return () => window.clearInterval(timer);
-  }, [lines.length, speed]);
+  }, [lines.length, reducedMotion, speed]);
+
+  const revealed = reducedMotion ? lines.length : shown;
 
   return (
     <>
-      {lines.slice(0, shown).map((line) => (
+      {lines.slice(0, revealed).map((line) => (
         <p key={`${line.tone}-${line.text}`} className="whitespace-pre-wrap">
           {line.prefix ? (
             <>
@@ -167,7 +198,7 @@ function TypedOutput({ lines, speed }: { lines: OutputLine[]; speed: number }) {
           )}
         </p>
       ))}
-      {shown < lines.length ? (
+      {revealed < lines.length ? (
         <span className="inline-block h-3 w-1.5 animate-pulse bg-accent" />
       ) : null}
     </>
@@ -383,16 +414,16 @@ export function WorkstationPreview() {
             style={{ backgroundImage: "url('/screenshots/wall1.png')" }}
           >
             <div
-              className="grid flex-1 grid-cols-1 gap-2 transition-all duration-300 sm:grid-cols-2"
+              className="grid flex-1 grid-cols-1 transition-all duration-300 sm:grid-cols-2"
               style={{
-                gap: `${layout.gaps}px`,
-                padding: `${layout.gaps}px`,
+                gap: `${layout.gapInner}px`,
+                padding: `${layout.gapOuter}px`,
               }}
             >
               <div
                 className="flex flex-col justify-between border-[1.5px] bg-surface p-3 transition-all duration-300"
                 style={{
-                  borderColor: "#B4F03A",
+                  borderColor: "var(--accent-primary)",
                   borderWidth: `${layout.border}px`,
                   opacity: 1,
                 }}
@@ -413,7 +444,7 @@ export function WorkstationPreview() {
               <div
                 className="flex flex-col justify-between border-[1.5px] bg-surface p-3 transition-all duration-300"
                 style={{
-                  borderColor: "#1C2229",
+                  borderColor: "var(--border-hairline)",
                   borderWidth: `${layout.border}px`,
                   opacity: layout.inactiveOpacity,
                 }}
