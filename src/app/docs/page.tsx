@@ -142,14 +142,19 @@ function DataTable({
         </thead>
         <tbody>
           {rows.map((row, index) => (
-            <tr key={index} className="align-top">
+            <tr
+              key={index}
+              className={`align-top ${
+                index === rows.length - 1 ? "[&>*]:border-b-0" : ""
+              }`}
+            >
               <th
                 scope="row"
-                className="border-b-[1.5px] border-hairline px-3 py-2 font-mono text-[12px] font-normal text-primary last:border-b-0"
+                className="border-b-[1.5px] border-hairline px-3 py-2 font-mono text-[12px] font-normal text-primary"
               >
                 {row[0]}
               </th>
-              <td className="border-b-[1.5px] border-hairline px-3 py-2 text-[13px] leading-[1.65] text-muted last:border-b-0 [&_kbd]:align-middle">
+              <td className="wrap-anywhere border-b-[1.5px] border-hairline px-3 py-2 text-[13px] leading-[1.65] text-muted [&_kbd]:align-middle">
                 {row[1]}
               </td>
             </tr>
@@ -171,41 +176,41 @@ export default function DocsPage() {
       </a>
       <Navbar />
 
-      <div className="border-b-[1.5px] border-hairline">
-        <div className="mx-auto max-w-7xl px-5 py-10 sm:px-6 sm:py-12 lg:px-8">
-          <nav aria-label="Breadcrumb">
-            <ol className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
-              <li>
-                <Link href="/" className="transition-colors hover:text-primary">
-                  Home
-                </Link>
-              </li>
-              <li aria-hidden="true">/</li>
-              <li aria-current="page" className="text-primary">
-                Documentation
-              </li>
-            </ol>
-          </nav>
-          <p className="mt-6 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-accent">
-            Documentation
-          </p>
-          <h1 className="mt-3 text-balance text-3xl text-primary sm:text-[2.5rem] sm:leading-[1.15]">
-            Operating a FluorineOS workstation
-          </h1>
-          <p className="mt-4 max-w-2xl text-pretty text-[15px] leading-[1.65] text-muted">
-            Reference material for installing, running, customizing, and repairing
-            FluorineOS 0.2.0. Every command here matches the shipped image and the
-            packages in the official APT repository.
-          </p>
-        </div>
-      </div>
-
       <main id="main" className="flex-1">
+        <div className="border-b-[1.5px] border-hairline">
+          <div className="mx-auto max-w-7xl px-5 py-10 sm:px-6 sm:py-12 lg:px-8">
+            <nav aria-label="Breadcrumb">
+              <ol className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+                <li>
+                  <Link href="/" className="transition-colors hover:text-primary">
+                    Home
+                  </Link>
+                </li>
+                <li aria-hidden="true">/</li>
+                <li aria-current="page" className="text-primary">
+                  Documentation
+                </li>
+              </ol>
+            </nav>
+            <p className="mt-6 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-accent">
+              Documentation
+            </p>
+            <h1 className="mt-3 text-balance text-3xl text-primary sm:text-[2.5rem] sm:leading-[1.15]">
+              Operating a FluorineOS workstation
+            </h1>
+            <p className="mt-4 max-w-2xl text-pretty text-[15px] leading-[1.65] text-muted">
+              Reference material for installing, running, customizing, and repairing
+              FluorineOS 0.2.0. Every command here matches the shipped image and the
+              packages in the official APT repository.
+            </p>
+          </div>
+        </div>
+
         <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
           <div className="lg:grid lg:grid-cols-[232px_minmax(0,1fr)] lg:gap-10">
             <aside
               aria-label="Documentation navigation"
-              className="border-b-[1.5px] border-hairline py-6 lg:sticky lg:top-16 lg:max-h-[calc(100vh-4rem)] lg:self-start lg:overflow-y-auto lg:border-b-0 lg:border-r-[1.5px] lg:border-hairline lg:py-10 lg:pr-6"
+              className="border-b-[1.5px] border-hairline py-6 lg:sticky lg:top-16 lg:max-h-[calc(100vh-4rem)] lg:self-start lg:overflow-y-auto lg:border-b-0 lg:border-r-[1.5px] lg:border-hairline lg:py-12 lg:pr-6"
             >
               <DocsNav />
             </aside>
